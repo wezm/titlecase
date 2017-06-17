@@ -1,9 +1,13 @@
+extern crate regex;
+
+use regex::{Regex, Captures};
+
 const SMALL_WORDS: [&str; 19] = [
-    "(?<!q&)a",
+    "a",
     "an",
     "and",
     "as",
-    "at(?!&t)",
+    "at",
     "but",
     "by",
     "en",
@@ -20,8 +24,86 @@ const SMALL_WORDS: [&str; 19] = [
     "vs[.]?",
 ];
 
+// TODO: Deal with AT&T and Q&A
+
+// https://stackoverflow.com/a/38406885
+fn ucfirst(input: &str) -> String {
+    let mut chars = input.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + chars.as_str(),
+    }
+}
+
 pub fn titlecase(input: &str) -> String {
-    input.trim().to_string()
+    let apos = r"(?: ['’] [[:lower:]]* )?";
+    let small_re = SMALL_WORDS.join("|");
+    let contains_lowercase = Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
+
+    let trimmed_input = input.trim();
+
+    // If input is yelling (all uppercase) make lowercase
+    let result = if !contains_lowercase.is_match(trimmed_input) {
+        trimmed_input.to_lowercase()
+    }
+    else {
+        trimmed_input.to_string()
+    };
+
+    // TODO: Extract each phase into its own method
+    let re = Regex::new(&format!(r"(?x)
+        \b _* (?:
+            ( \x20[/\\] [[:alpha:]]+ [-_[:alpha:]/\\]+ |  # file path or
+            [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ {apos} )   # URL, domain, or email
+            |
+            ( (?i) {small_re} {apos} )                         # or small word (case-insensitive)
+            |
+            ( [[:alpha:]] [[:lower:]'’()\[\]{{}}]* {apos} )    # or word w/o internal caps
+            |
+            ( [[:alpha:]] [[:alpha:]'’()\[\]{{}}]* {apos} )    # or some other word
+        ) _* \b", apos = apos, small_re = small_re)).expect("unable to compile regex");
+
+    let result = re.replace_all(&result, |captures: &Captures| {
+        if let Some(file_url_domain_or_email) = captures.get(1) {
+            file_url_domain_or_email.as_str().to_string()
+        }
+        else if let Some(small_word) = captures.get(2) {
+            small_word.as_str().to_lowercase()
+        }
+        else if let Some(lower_word) = captures.get(3) {
+            ucfirst(lower_word.as_str())
+        }
+        else {
+            // preserve other kinds of words
+            captures[4].to_string()
+        }
+    }).to_string();
+
+    // exceptions for small words: capitalize at start and end of title
+    let re = Regex::new(&format!(r#"(?xi)
+        ( \A [[:punct:]]*        # start of title...
+        |  [:.;?!]\x20+             # or of subsentence...
+        |  \x20['"“‘(\[]\x20*     )  # or of inserted subphrase...
+        ( {small_re} ) \b          # ... followed by small word
+        "#, small_re = small_re)).expect("unable to complie regex 2");
+
+    let result = re.replace_all(&result, |captures: &Captures| {
+        let mut replacement = captures[1].to_string();
+        replacement.push_str(&ucfirst(&captures[2]));
+        replacement
+    }).to_string();
+
+    let re = Regex::new(&format!(r#"(?xi)
+        \b ( {small_re} )      # small word...
+        ( [[:punct:]]* \z    # ... at the end of the title...
+        |   ['"’”)\]] \x20 )   # ... or of an inserted subphrase?
+        "#, small_re = small_re)).expect("unable to complie regex 3");
+
+    re.replace_all(&result, |captures: &Captures| {
+        let mut replacement = ucfirst(&captures[1]);
+        replacement.push_str(&captures[2]);
+        replacement
+    }).to_string()
 }
 
 macro_rules! testcase {
@@ -84,15 +166,15 @@ testcase!(
 );
 
 testcase!(
-    single_quotes,
+    q_and_a,
     "Q&A with Steve Jobs: 'That's what happens in technology'",
     "Q&A With Steve Jobs: 'That's What Happens in Technology'"
 );
 
-testcase!(atandt, "What is AT&T's problem?", "What Is AT&T's Problem?");
+testcase!(at_and_t, "What is AT&T's problem?", "What Is AT&T's Problem?");
 
 testcase!(
-    atandt2,
+    at_and_t2,
     "Apple deal with AT&T falls through",
     "Apple Deal With AT&T Falls Through"
 );
@@ -162,7 +244,7 @@ testcase!(trimming2, "this is trimming  ", "This Is Trimming");
 testcase!(trimming3, "  this is trimming  ", "This Is Trimming");
 
 testcase!(
-    yalling,
+    yelling,
     "IF IT’S ALL CAPS, FIX IT",
     "If It’s All Caps, Fix It"
 );
@@ -178,3 +260,15 @@ testcase!(
     "Never touch paths like /var/run before/after /boot",
     "Never Touch Paths Like /var/run Before/After /boot"
 );
+
+fn file_paths(input: &str) -> Vec<String> {
+    let re = Regex::new(r"(\x20[/\\][[:alpha:]]+[-_[:alpha:]/\\]+)|.").expect("file_paths regex");
+    re.captures_iter(input).map(|cap| cap[1].to_string()).collect::<Vec<_>>()
+}
+
+
+#[test]
+fn test_file_paths() {
+    let a = file_paths("Never touch paths like /var/run before/after /boot");
+    assert_eq!(a, vec![" /var/run".to_string(), " /boot".to_string()]);
+}
