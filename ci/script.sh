@@ -13,8 +13,9 @@ main() {
     cross test --target $TARGET
     cross test --target $TARGET --release
 
-    echo "This is a very simple test" | cross run --target $TARGET
-    echo "This is a very simple test" | cross run --target $TARGET --release
+    # TODO: Find out how to prevent "the input device is not a TTY" error
+    # echo "This is a very simple test" | cross run --target $TARGET
+    # echo "This is a very simple test" | cross run --target $TARGET --release
 }
 
 # we don't run the "test phase" when doing deploys
