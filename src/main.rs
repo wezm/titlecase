@@ -1,3 +1,15 @@
+extern crate titlecase;
+
+use std::io::{self, BufRead};
+use titlecase::titlecase;
+
 fn main() {
-    println!("Hello, world!");
+    let stdin = io::stdin();
+
+    for line in stdin.lock().lines() {
+        match line {
+            Ok(line) => println!("{}", titlecase(&line)),
+            Err(error) => println!("error: {}", error),
+        }
+    }
 }
