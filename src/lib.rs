@@ -24,8 +24,6 @@ const SMALL_WORDS: [&str; 19] = [
     "vs[.]?",
 ];
 
-// TODO: Deal with AT&T and Q&A
-
 // https://stackoverflow.com/a/38406885
 fn ucfirst(input: &str) -> String {
     let mut chars = input.chars();
@@ -35,9 +33,71 @@ fn ucfirst(input: &str) -> String {
     }
 }
 
+fn is_digital_resource(word: &str) -> bool {
+    let re = Regex::new(
+        r"(?x)
+        \A
+        (?: (?: [/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ | # file path or
+          [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )     # URL, domain, or email",
+    ).expect("unable to compile file/url regex");
+    re.is_match(word)
+}
+
+// E.g. iPhone or DuBois
+fn has_internal_caps(word: &str) -> bool {
+    word.chars().skip(1).any(|chr| chr.is_uppercase())
+}
+
+fn has_internal_slashes(word: &str) -> bool {
+    word.chars().skip(1).any(|chr| chr == '/')
+}
+
+fn starts_with_bracket(word: &str) -> bool {
+    match word.chars().next() {
+        Some('(') => true,
+        _ => false,
+    }
+}
+
+fn fix_small_word_at_start(text: &str) -> String {
+    let re = Regex::new(&format!(
+        r#"(?x)
+        ( \A [[:punct:]]*        # start of title...
+        |  [:.;?!]\x20+          # or of subsentence...
+        |  \x20['"“‘(\[]\x20* )  # or of inserted subphrase...
+        ( {small_re} ) \b        # ... followed by small word
+        "#,
+        small_re = SMALL_WORDS.join("|")
+    )).expect("unable to compile fix_small_word_at_start regex");
+
+    re.replace_all(text, |captures: &Captures| {
+        let mut result = captures[1].to_owned();
+        result.push_str(&ucfirst(&captures[2]));
+        result
+    }).to_string()
+}
+
+fn fix_small_word_at_end(text: &str) -> String {
+    let re = Regex::new(&format!(
+        r#"(?x)
+        \b ( {small_re} )     # small word...
+        ( [[:punct:]]* \z     # ... at the end of the title...
+        |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
+        "#,
+        small_re = SMALL_WORDS.join("|")
+    )).expect("unable to compile fix_small_word_at_end regex");
+
+    re.replace_all(text, |captures: &Captures| {
+        let mut result = ucfirst(&captures[1]);
+        result.push_str(&captures[2]);
+        result
+    }).to_string()
+}
+
+
 pub fn titlecase(input: &str) -> String {
-    let apos = r"(?: ['’] [[:lower:]]* )?";
-    let small_re = SMALL_WORDS.join("|");
+    let small_re = Regex::new(&format!(r"\A(?:{})\z", SMALL_WORDS.join("|")))
+        .expect("unable to compile small words regex");
     let contains_lowercase = Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
 
     let trimmed_input = input.trim();
@@ -45,65 +105,53 @@ pub fn titlecase(input: &str) -> String {
     // If input is yelling (all uppercase) make lowercase
     let result = if !contains_lowercase.is_match(trimmed_input) {
         trimmed_input.to_lowercase()
-    }
-    else {
+    } else {
         trimmed_input.to_string()
     };
 
-    // TODO: Extract each phase into its own method
-    let re = Regex::new(&format!(r"(?x)
-        \b _* (?:
-            ( \x20[/\\] [[:alpha:]]+ [-_[:alpha:]/\\]+ |  # file path or
-            [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ {apos} )   # URL, domain, or email
-            |
-            ( (?i) {small_re} {apos} )                         # or small word (case-insensitive)
-            |
-            ( [[:alpha:]] [[:lower:]'’()\[\]{{}}]* {apos} )    # or word w/o internal caps
-            |
-            ( [[:alpha:]] [[:alpha:]'’()\[\]{{}}]* {apos} )    # or some other word
-        ) _* \b", apos = apos, small_re = small_re)).expect("unable to compile regex");
+    let words = Regex::new(
+        r"(?x)
+         (_*)
+         ([\w'’.:/@\[\]/()]+)
+         (_*)",
+    ).expect("unable to compile regex");
 
-    let result = re.replace_all(&result, |captures: &Captures| {
-        if let Some(file_url_domain_or_email) = captures.get(1) {
-            file_url_domain_or_email.as_str().to_string()
-        }
-        else if let Some(small_word) = captures.get(2) {
-            small_word.as_str().to_lowercase()
-        }
-        else if let Some(lower_word) = captures.get(3) {
-            ucfirst(lower_word.as_str())
-        }
-        else {
-            // preserve other kinds of words
-            captures[4].to_string()
-        }
-    }).to_string();
+    let result = words
+        .replace_all(&result, |captures: &Captures| {
+            let mut result = captures
+                .get(1)
+                .map(|cap| cap.as_str())
+                .unwrap_or("")
+                .to_owned();
+            let word = &captures[2];
 
-    // exceptions for small words: capitalize at start and end of title
-    let re = Regex::new(&format!(r#"(?xi)
-        ( \A [[:punct:]]*        # start of title...
-        |  [:.;?!]\x20+             # or of subsentence...
-        |  \x20['"“‘(\[]\x20*     )  # or of inserted subphrase...
-        ( {small_re} ) \b          # ... followed by small word
-        "#, small_re = small_re)).expect("unable to complie regex 2");
+            result.push_str(&if is_digital_resource(word) {
+                // pass through
+                word.to_owned()
+            } else if small_re.is_match(word) {
+                word.to_lowercase()
+            } else if starts_with_bracket(word) {
+                let rest = titlecase(&word.chars().skip(1).collect::<String>());
+                format!("({}", rest)
+            } else if has_internal_slashes(word) {
+                word.split("/")
+                    .map(|sub_word| titlecase(sub_word))
+                    .collect::<Vec<_>>()
+                    .join("/")
+            } else if has_internal_caps(word) {
+                // Preserve internal caps like iPhone or DuBois
+                word.to_owned()
+            } else {
+                ucfirst(word)
+            });
 
-    let result = re.replace_all(&result, |captures: &Captures| {
-        let mut replacement = captures[1].to_string();
-        replacement.push_str(&ucfirst(&captures[2]));
-        replacement
-    }).to_string();
+            result.push_str(captures.get(3).map(|cap| cap.as_str()).unwrap_or(""));
+            result
+        })
+        .to_string();
 
-    let re = Regex::new(&format!(r#"(?xi)
-        \b ( {small_re} )      # small word...
-        ( [[:punct:]]* \z    # ... at the end of the title...
-        |   ['"’”)\]] \x20 )   # ... or of an inserted subphrase?
-        "#, small_re = small_re)).expect("unable to complie regex 3");
-
-    re.replace_all(&result, |captures: &Captures| {
-        let mut replacement = ucfirst(&captures[1]);
-        replacement.push_str(&captures[2]);
-        replacement
-    }).to_string()
+    // Now deal with small words at the start and end of the text
+    fix_small_word_at_end(&fix_small_word_at_start(&result))
 }
 
 macro_rules! testcase {
@@ -122,14 +170,20 @@ testcase!(
 );
 
 testcase!(
-    name,
+    subphrase_in_single_quotes,
     "2lmc Spool: 'Gruber on OmniFocus and Vapo(u)rware'",
     "2lmc Spool: 'Gruber on OmniFocus and Vapo(u)rware'"
 );
 
 testcase!(
+    subphrase_in_double_quotes,
+    r#"2lmc Spool: "Gruber on OmniFocus and Vapo(u)rware""#,
+    r#"2lmc Spool: "Gruber on OmniFocus and Vapo(u)rware""#
+);
+
+testcase!(
     curly_double_quotes,
-    "Have you read “The Lottery”?",
+    "Have you read “the lottery”?",
     "Have You Read “The Lottery”?"
 );
 
@@ -137,6 +191,12 @@ testcase!(
     brackets,
     "your hair[cut] looks (nice)",
     "Your Hair[cut] Looks (Nice)"
+);
+
+testcase!(
+    multiple_brackets,
+    "your hair[cut] looks ((Very Nice))",
+    "Your Hair[cut] Looks ((Very Nice))"
 );
 
 testcase!(
@@ -171,7 +231,11 @@ testcase!(
     "Q&A With Steve Jobs: 'That's What Happens in Technology'"
 );
 
-testcase!(at_and_t, "What is AT&T's problem?", "What Is AT&T's Problem?");
+testcase!(
+    at_and_t,
+    "What is AT&T's problem?",
+    "What Is AT&T's Problem?"
+);
 
 testcase!(
     at_and_t2,
@@ -200,7 +264,7 @@ testcase!(
 );
 
 testcase!(
-    small_word_at_start,
+    small_word_at_end,
     "Small word at end is nothing to be afraid of",
     "Small Word at End Is Nothing to Be Afraid Of"
 );
@@ -215,6 +279,12 @@ testcase!(
     subphrase_with_small_word_in_single_quotes,
     "Sub-phrase with a small word in quotes: 'a trick, perhaps?'",
     "Sub-Phrase With a Small Word in Quotes: 'A Trick, Perhaps?'"
+);
+
+testcase!(
+    a_subphrase_with_small_word_in_single_quotes,
+    "a Sub-phrase with a small word in quotes: 'a trick, perhaps?'",
+    "A Sub-Phrase With a Small Word in Quotes: 'A Trick, Perhaps?'"
 );
 
 testcase!(
@@ -260,15 +330,3 @@ testcase!(
     "Never touch paths like /var/run before/after /boot",
     "Never Touch Paths Like /var/run Before/After /boot"
 );
-
-fn file_paths(input: &str) -> Vec<String> {
-    let re = Regex::new(r"(\x20[/\\][[:alpha:]]+[-_[:alpha:]/\\]+)|.").expect("file_paths regex");
-    re.captures_iter(input).map(|cap| cap[1].to_string()).collect::<Vec<_>>()
-}
-
-
-#[test]
-fn test_file_paths() {
-    let a = file_paths("Never touch paths like /var/run before/after /boot");
-    assert_eq!(a, vec![" /var/run".to_string(), " /boot".to_string()]);
-}
