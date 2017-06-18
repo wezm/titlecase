@@ -221,8 +221,8 @@ testcase!(
 
 testcase!(
     markdown,
-    "Read markdown_rules.txt to find out how _underscores around words_ will be interpretted",
-    "Read markdown_rules.txt to Find Out How _Underscores Around Words_ Will Be Interpretted"
+    "Read markdown_rules.txt to find out how _underscores around words_ will be interpreted",
+    "Read markdown_rules.txt to Find Out How _Underscores Around Words_ Will Be interpreted"
 );
 
 testcase!(
@@ -330,3 +330,28 @@ testcase!(
     "Never touch paths like /var/run before/after /boot",
     "Never Touch Paths Like /var/run Before/After /boot"
 );
+
+testcase!(
+    in_flight,
+    "The in-flight entertainment was excellent",
+    "The In-Flight Entertainment Was Excellent"
+);
+
+testcase!(
+    stand_in,
+    "The Stand-in teacher gave us homework",
+    "The Stand-In Teacher Gave Us Homework"
+);
+
+// TODO: Implement these
+// testcase!(
+//     man_in_the_middle,
+//     "They executed a man-in-the-middle attack",
+//     "They Executed a Man-in-the-Middle Attack"
+// );
+
+// testcase!(
+//     man_in_the_machine,
+//     "Jonathan Kim on Alex Gibney’s ‘Steve Jobs: The man in the machine’",
+//     "Jonathan Kim on Alex Gibney’s ‘Steve Jobs: The Man in the Machine’"
+// );
