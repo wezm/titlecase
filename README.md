@@ -5,8 +5,9 @@ by John Gruber for post titles on his website [Daring Fireball]. `titlecase`
 runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A dependency free, single
 file binary is built for each supported platform for [every release][releases].
 
-![Travis CI Badge](https://travis-ci.org/wezm/titlecase.svg?branch=master)
-![crates.io Badge](https://crates.io/crates/titlecase)
+[![Travis CI Badge](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
+[![Windows build status](https://ci.appveyor.com/api/projects/status/github/wezm/titlecase?svg=true)](https://ci.appveyor.com/project/wezm/titlecase)
+[![crates.io Badge](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
 
 `titlecase` is licensed under the [MIT license][MIT].
 
