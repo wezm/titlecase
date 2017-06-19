@@ -35,16 +35,6 @@ to **stdout**.
 [Pre-built `titlecase` binaries][releases] are available for Linux, macOS,
 FreeBSD, NetBSD, and Windows.
 
-### Arch Linux
-
-`titlecase` is available in the Arch User Repository (AUR):
-
-```
-% git clone https://aur.example.com/titlecase.git
-% cd titlecase
-% makepkg -si
-```
-
 ### Rust Developer/Cargo
 
 If you have a stable Rust compiler toolchain installed you can install
