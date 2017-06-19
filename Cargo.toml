@@ -1,7 +1,7 @@
 [package]
 name = "titlecase"
 description = "A tool that capitlizes text according to a style defined by John Gruber for post titles on his website Daring Fireball."
-version = "0.9.0"
+version = "0.9.1"
 authors = ["Wesley Moore <wes@wezm.net>"]
 
 documentation = "https://docs.rs/crate/titlecase"
@@ -14,8 +14,8 @@ keywords = ["title", "case", "capitalization", "capitilisation", "capitilize"]
 categories = ["text-processing"]
 
 [badges]
-travis-ci = { repository = "https://github.com/wezm/titlecase" }
-appveyor = { repository = "https://github.com/wezm/titlecase" }
+travis-ci = { repository = "wezm/titlecase" }
+appveyor = { repository = "wezm/titlecase" }
 
 [dependencies]
 regex = "0.2.2"
