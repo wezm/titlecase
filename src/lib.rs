@@ -1,8 +1,8 @@
-//! `titlecase` capitlizes text according to a style defined by John Gruber for
-//! post titles on his website [Daring Fireball](https://daringfireball.net/).
-//! `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A dependency
-//! free, single file binary is built for each supported platform for [every
-//! release][releases].
+//! `titlecase` capitlizes English text according to [a style][style] defined by John
+//! Gruber for post titles on his website [Daring Fireball].
+//!
+//! [Daring Fireball]: https://daringfireball.net/
+//! [style]: https://daringfireball.net/2008/05/title_case
 //!
 //! ## Usage
 //!
@@ -31,10 +31,10 @@
 //! ```
 //!
 //! ## Style
-//! 
-//! Instead of simply capitalizing each word it does the following (amongst other
-//! things):
-//! 
+//!
+//! Instead of simply capitalizing each word it does the following ([amongst other
+//! things][style]):
+//!
 //! * Lower case small words like an, of, or in.
 //! * Don't capitalize words like iPhone.
 //! * Don't interfere with file paths, URLs, domains, and email addresses.

@@ -1,13 +1,15 @@
 # Title Case (titlecase)
 
-`titlecase` is a small tool that capitlizes text according to a style defined
-by John Gruber for post titles on his website [Daring Fireball]. `titlecase`
-runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A dependency free, single
-file binary is built for each supported platform for [every release][releases].
+`titlecase` is a small tool that capitlizes English text [according to a
+style][style] defined by John Gruber for post titles on his website [Daring
+Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A
+dependency free, single-file binary is built for each supported platform for
+[every release][releases].
 
-[![Travis CI Badge](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
-[![Windows build status](https://ci.appveyor.com/api/projects/status/github/wezm/titlecase?svg=true)](https://ci.appveyor.com/project/wezm/titlecase)
-[![crates.io Badge](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
+[![Travis CI](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/github/wezm/titlecase?svg=true)](https://ci.appveyor.com/project/wezm/titlecase)
+[![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
+[![Documentation](https://docs.rs/titlecase/badge.svg)][crate-docs]
 
 `titlecase` is licensed under the [MIT license][MIT].
 
@@ -25,10 +27,14 @@ An Example With Small Words and Sub-Phrases: "The Example"
 
 ```
 
-## Usage
+## Command Line Usage
 
 `titlecase` reads lines of text from **stdin** and prints title cased versions
 to **stdout**.
+
+## Usage as a Rust Crate
+
+See the [crate documentation][crate-docs].
 
 ## Installation
 
@@ -46,8 +52,8 @@ If you have a stable Rust compiler toolchain installed you can install
 
 ## Style
 
-Instead of simply capitalizing each word it does the following (amongst other
-things):
+Instead of simply capitalizing each word `titlecase` does the following
+([amongst other things][style]):
 
 * Lower case small words like an, of, or in.
 * Don't capitalize words like iPhone.
@@ -59,14 +65,18 @@ things):
 
 ## Credits
 
-This tool makes use of prior work by [John Gruber], [Aristotle Pagaltzis], and
-[David Gouch].
-
-
+This tool makes use of prior work by [John Gruber][style], [Aristotle
+Pagaltzis], and [David Gouch]. The continuous integration configuration uses
+[trust] by Jorge Aparicio, dual licensed under [the MIT][trust-mit] and
+[Apache][trust-apache] licenses.
 
 [Daring Fireball]: https://daringfireball.net/
-[John Gruber]: https://daringfireball.net/2008/05/title_case
+[style]: https://daringfireball.net/2008/05/title_case
 [Aristotle Pagaltzis]: http://plasmasturm.org/code/titlecase/
 [David Gouch]: http://individed.com/code/to-title-case/
 [releases]: https://github.com/wezm/titlecase/releases
 [MIT]: https://github.com/wezm/titlecase/blob/master/LICENSE
+[trust]: https://github.com/japaric/trust
+[trust-mit]: https://github.com/japaric/trust/blob/master/LICENSE-MIT
+[trust-apache]: https://github.com/japaric/trust/blob/master/LICENSE-APACHE
+[crate-docs]: https://docs.rs/crate/titlecase
