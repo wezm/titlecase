@@ -85,8 +85,8 @@ fn is_digital_resource(word: &str) -> bool {
         static ref RE: Regex = Regex::new(
             r"(?x)
             \A
-            (?: (?: [/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ | # file path or
-              [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )     # URL, domain, or email",
+            (?: [/\\] [[:alpha:]]+ [-_[:alpha:]/\\]+ |   # file path or
+              [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )  # URL, domain, or email",
         ).expect("unable to compile file/url regex");
     }
     RE.is_match(word)
