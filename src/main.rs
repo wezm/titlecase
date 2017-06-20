@@ -1,6 +1,6 @@
 extern crate titlecase;
 
-use std::io::{self, BufRead};
+use std::io::{self, BufRead, Write};
 use titlecase::titlecase;
 
 fn main() {
@@ -9,7 +9,8 @@ fn main() {
     for line in stdin.lock().lines() {
         match line {
             Ok(line) => println!("{}", titlecase(&line)),
-            Err(error) => println!("error: {}", error),
+            Err(error) => writeln!(io::stderr(), "{}\n", error)
+                .expect("error writing error to stderr"),
         }
     }
 }
