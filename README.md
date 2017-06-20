@@ -46,8 +46,8 @@ If you have a stable Rust compiler toolchain installed you can install
 
 ## Style
 
-Instead of
-simply capitalizing each word it does the following (amongst other things):
+Instead of simply capitalizing each word it does the following (amongst other
+things):
 
 * Lower case small words like an, of, or in.
 * Don't capitalize words like iPhone.

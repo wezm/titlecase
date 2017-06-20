@@ -1,3 +1,49 @@
+//! `titlecase` capitlizes text according to a style defined by John Gruber for
+//! post titles on his website [Daring Fireball](https://daringfireball.net/).
+//! `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A dependency
+//! free, single file binary is built for each supported platform for [every
+//! release][releases].
+//!
+//! ## Usage
+//!
+//! Add the crate to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! titlecase = "0.9"
+//! ```
+//!
+//! Then import into your code:
+//!
+//! ```rust
+//! extern crate titlecase;
+//! ```
+//!
+//! ## Example
+//!
+//! ```rust
+//! use titlecase::titlecase;
+//!
+//! let text = "a sample title to capitalize: an example";
+//! let capitalized_text =  "A Sample Title to Capitalize: An Example".to_owned();
+//!
+//! assert_eq!(titlecase(text), capitalized_text);
+//! ```
+//!
+//! ## Style
+//! 
+//! Instead of simply capitalizing each word it does the following (amongst other
+//! things):
+//! 
+//! * Lower case small words like an, of, or in.
+//! * Don't capitalize words like iPhone.
+//! * Don't interfere with file paths, URLs, domains, and email addresses.
+//! * Always capitalize the first and last words, even if they are small words
+//!   or surrounded by quotes.
+//! * Don't interfere with terms like "Q&A", or "AT&T".
+//! * Capitalize small words after a colon.
+
+#[macro_use] extern crate lazy_static;
 extern crate regex;
 
 use regex::{Regex, Captures};
@@ -34,13 +80,15 @@ fn ucfirst(input: &str) -> String {
 }
 
 fn is_digital_resource(word: &str) -> bool {
-    let re = Regex::new(
-        r"(?x)
-        \A
-        (?: (?: [/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ | # file path or
-          [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )     # URL, domain, or email",
-    ).expect("unable to compile file/url regex");
-    re.is_match(word)
+    lazy_static! {
+        static ref RE: Regex = Regex::new(
+            r"(?x)
+            \A
+            (?: (?: [/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ | # file path or
+              [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )     # URL, domain, or email",
+        ).expect("unable to compile file/url regex");
+    }
+    RE.is_match(word)
 }
 
 // E.g. iPhone or DuBois
@@ -60,17 +108,19 @@ fn starts_with_bracket(word: &str) -> bool {
 }
 
 fn fix_small_word_at_start(text: &str) -> String {
-    let re = Regex::new(&format!(
-        r#"(?x)
-        ( \A [[:punct:]]*        # start of title...
-        |  [:.;?!]\x20+          # or of subsentence...
-        |  \x20['"“‘(\[]\x20* )  # or of inserted subphrase...
-        ( {small_re} ) \b        # ... followed by small word
-        "#,
-        small_re = SMALL_WORDS.join("|")
-    )).expect("unable to compile fix_small_word_at_start regex");
+    lazy_static! {
+        static ref RE: Regex = Regex::new(&format!(
+            r#"(?x)
+            ( \A [[:punct:]]*        # start of title...
+            |  [:.;?!]\x20+          # or of subsentence...
+            |  \x20['"“‘(\[]\x20* )  # or of inserted subphrase...
+            ( {small_re} ) \b        # ... followed by small word
+            "#,
+            small_re = SMALL_WORDS.join("|")
+        )).expect("unable to compile fix_small_word_at_start regex");
+    }
 
-    re.replace_all(text, |captures: &Captures| {
+    RE.replace_all(text, |captures: &Captures| {
         let mut result = captures[1].to_owned();
         result.push_str(&ucfirst(&captures[2]));
         result
@@ -78,45 +128,58 @@ fn fix_small_word_at_start(text: &str) -> String {
 }
 
 fn fix_small_word_at_end(text: &str) -> String {
-    let re = Regex::new(&format!(
-        r#"(?x)
-        \b ( {small_re} )     # small word...
-        ( [[:punct:]]* \z     # ... at the end of the title...
-        |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
-        "#,
-        small_re = SMALL_WORDS.join("|")
-    )).expect("unable to compile fix_small_word_at_end regex");
+    lazy_static! {
+        static ref RE: Regex = Regex::new(&format!(
+            r#"(?x)
+            \b ( {small_re} )     # small word...
+            ( [[:punct:]]* \z     # ... at the end of the title...
+            |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
+            "#,
+            small_re = SMALL_WORDS.join("|")
+        )).expect("unable to compile fix_small_word_at_end regex");
+    }
 
-    re.replace_all(text, |captures: &Captures| {
+    RE.replace_all(text, |captures: &Captures| {
         let mut result = ucfirst(&captures[1]);
         result.push_str(&captures[2]);
         result
     }).to_string()
 }
 
-
+/// Returns `input` in title case
+///
+/// ### Example
+///
+/// ```rust
+/// use titlecase::titlecase;
+///
+/// let text = "a sample title to capitalize: an example";
+/// assert_eq!(titlecase(text), "A Sample Title to Capitalize: An Example");
+/// ```
 pub fn titlecase(input: &str) -> String {
-    let small_re = Regex::new(&format!(r"\A(?:{})\z", SMALL_WORDS.join("|")))
-        .expect("unable to compile small words regex");
-    let contains_lowercase = Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
+    lazy_static! {
+        static ref SMALL_RE: Regex = Regex::new(&format!(r"\A(?:{})\z", SMALL_WORDS.join("|")))
+            .expect("unable to compile small words regex");
+        static ref CONTAINS_LOWERCASE: Regex = Regex::new(r"[[:lower:]]")
+            .expect("unable to compile lowercase regex");
+        static ref WORDS: Regex = Regex::new(
+            r"(?x)
+             (_*)
+             ([\w'’.:/@\[\]/()]+)
+             (_*)",
+        ).expect("unable to compile regex");
+    }
 
     let trimmed_input = input.trim();
 
     // If input is yelling (all uppercase) make lowercase
-    let result = if !contains_lowercase.is_match(trimmed_input) {
+    let result = if !CONTAINS_LOWERCASE.is_match(trimmed_input) {
         trimmed_input.to_lowercase()
     } else {
         trimmed_input.to_string()
     };
 
-    let words = Regex::new(
-        r"(?x)
-         (_*)
-         ([\w'’.:/@\[\]/()]+)
-         (_*)",
-    ).expect("unable to compile regex");
-
-    let result = words
+    let result = WORDS
         .replace_all(&result, |captures: &Captures| {
             let mut result = captures
                 .get(1)
@@ -128,7 +191,7 @@ pub fn titlecase(input: &str) -> String {
             result.push_str(&if is_digital_resource(word) {
                 // pass through
                 word.to_owned()
-            } else if small_re.is_match(word) {
+            } else if SMALL_RE.is_match(word) {
                 word.to_lowercase()
             } else if starts_with_bracket(word) {
                 let rest = titlecase(&word.chars().skip(1).collect::<String>());

@@ -17,5 +17,10 @@ categories = ["text-processing"]
 travis-ci = { repository = "wezm/titlecase" }
 appveyor = { repository = "wezm/titlecase" }
 
+[[bin]]
+name = "titlecase"
+doc = false
+
 [dependencies]
+lazy_static = "0.2.8"
 regex = "0.2.2"
