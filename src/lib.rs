@@ -43,7 +43,8 @@
 //! * Don't interfere with terms like "Q&A", or "AT&T".
 //! * Capitalize small words after a colon.
 
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 extern crate regex;
 
 use regex::{Regex, Captures};
