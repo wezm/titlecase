@@ -1,6 +1,6 @@
 # Title Case (titlecase)
 
-`titlecase` is a small tool that capitlizes English text [according to a
+`titlecase` is a small tool that capitalizes English text [according to a
 style][style] defined by John Gruber for post titles on his website [Daring
 Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A
 dependency free, single-file binary is built for each supported platform for
