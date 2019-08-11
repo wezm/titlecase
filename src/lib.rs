@@ -47,8 +47,9 @@
 extern crate lazy_static;
 extern crate regex;
 
-use regex::{Regex, Captures};
+use regex::{Captures, Regex};
 
+#[rustfmt::skip]
 const SMALL_WORDS: [&str; 19] = [
     "a",
     "an",
@@ -87,7 +88,8 @@ fn is_digital_resource(word: &str) -> bool {
             \A
             (?: [/\\] [[:alpha:]]+ [-_[:alpha:]/\\]+ |   # file path or
               [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )  # URL, domain, or email",
-        ).expect("unable to compile file/url regex");
+        )
+        .expect("unable to compile file/url regex");
     }
     RE.is_match(word)
 }
@@ -118,14 +120,16 @@ fn fix_small_word_at_start(text: &str) -> String {
             ( {small_re} ) \b        # ... followed by small word
             "#,
             small_re = SMALL_WORDS.join("|")
-        )).expect("unable to compile fix_small_word_at_start regex");
+        ))
+        .expect("unable to compile fix_small_word_at_start regex");
     }
 
     RE.replace_all(text, |captures: &Captures| {
         let mut result = captures[1].to_owned();
         result.push_str(&ucfirst(&captures[2]));
         result
-    }).to_string()
+    })
+    .to_string()
 }
 
 fn fix_small_word_at_end(text: &str) -> String {
@@ -137,14 +141,16 @@ fn fix_small_word_at_end(text: &str) -> String {
             |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
             "#,
             small_re = SMALL_WORDS.join("|")
-        )).expect("unable to compile fix_small_word_at_end regex");
+        ))
+        .expect("unable to compile fix_small_word_at_end regex");
     }
 
     RE.replace_all(text, |captures: &Captures| {
         let mut result = ucfirst(&captures[1]);
         result.push_str(&captures[2]);
         result
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Returns `input` in title case
@@ -161,14 +167,15 @@ pub fn titlecase(input: &str) -> String {
     lazy_static! {
         static ref SMALL_RE: Regex = Regex::new(&format!(r"\A(?:{})\z", SMALL_WORDS.join("|")))
             .expect("unable to compile small words regex");
-        static ref CONTAINS_LOWERCASE: Regex = Regex::new(r"[[:lower:]]")
-            .expect("unable to compile lowercase regex");
+        static ref CONTAINS_LOWERCASE: Regex =
+            Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
         static ref WORDS: Regex = Regex::new(
             r"(?x)
              (_*)
              ([\w'’.:/@\[\]/()]+)
              (_*)",
-        ).expect("unable to compile regex");
+        )
+        .expect("unable to compile regex");
     }
 
     let trimmed_input = input.trim();
@@ -224,7 +231,7 @@ macro_rules! testcase {
         fn $name() {
             assert_eq!(titlecase($input), $expected);
         }
-    }
+    };
 }
 
 testcase!(
