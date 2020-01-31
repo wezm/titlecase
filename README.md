@@ -46,10 +46,10 @@ FreeBSD, NetBSD, and Windows.
 **Minimum Supported Rust Version:** 1.30.1
 
 If you have a stable Rust compiler toolchain installed you can install
-`titlecase` with cargo:
+the most recently released `titlecase` with cargo:
 
 ```
-$ cargo install --path . titlecase
+% cargo install titlecase
 ```
 
 ## Style
@@ -68,9 +68,7 @@ Instead of simply capitalizing each word `titlecase` does the following
 ## Credits
 
 This tool makes use of prior work by [John Gruber][style], [Aristotle
-Pagaltzis], and [David Gouch]. The continuous integration configuration uses
-[trust] by Jorge Aparicio, dual licensed under [the MIT][trust-mit] and
-[Apache][trust-apache] licenses.
+Pagaltzis], and [David Gouch].
 
 [Daring Fireball]: https://daringfireball.net/
 [style]: https://daringfireball.net/2008/05/title_case
@@ -78,7 +76,4 @@ Pagaltzis], and [David Gouch]. The continuous integration configuration uses
 [David Gouch]: http://individed.com/code/to-title-case/
 [releases]: https://github.com/wezm/titlecase/releases
 [MIT]: https://github.com/wezm/titlecase/blob/master/LICENSE
-[trust]: https://github.com/japaric/trust
-[trust-mit]: https://github.com/japaric/trust/blob/master/LICENSE-MIT
-[trust-apache]: https://github.com/japaric/trust/blob/master/LICENSE-APACHE
 [crate-docs]: https://docs.rs/crate/titlecase
