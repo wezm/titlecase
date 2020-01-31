@@ -36,18 +36,20 @@ to **stdout**.
 
 See the [crate documentation][crate-docs].
 
-## Installation
+## Download
 
 [Pre-built `titlecase` binaries][releases] are available for Linux, macOS,
 FreeBSD, NetBSD, and Windows.
 
-### Rust Developer/Cargo
+## Building
+
+**Minimum Supported Rust Version:** 1.30.1
 
 If you have a stable Rust compiler toolchain installed you can install
 `titlecase` with cargo:
 
 ```
-% cargo install titlecase
+$ cargo install --path . titlecase
 ```
 
 ## Style
