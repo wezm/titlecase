@@ -10,18 +10,12 @@
 //!
 //! ```toml
 //! [dependencies]
-//! titlecase = "0.9"
-//! ```
-//!
-//! Then import into your code:
-//!
-//! ```rust
-//! extern crate titlecase;
+//! titlecase = "1.0"
 //! ```
 //!
 //! ## Example
 //!
-//! ```rust
+//! ```
 //! use titlecase::titlecase;
 //!
 //! let text = "a sample title to capitalize: an example";
@@ -72,11 +66,11 @@ const SMALL_WORDS: &[&str] = &[
     "vs[.]?",
 ];
 
-/// Returns `input` in title case
+/// Returns `input` in title case.
 ///
 /// ### Example
 ///
-/// ```rust
+/// ```
 /// use titlecase::titlecase;
 ///
 /// let text = "a sample title to capitalize: an example";
