@@ -7,7 +7,6 @@ dependency free, single-file binary is built for each supported platform for
 [every release][releases].
 
 [![Travis CI](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/github/wezm/titlecase?svg=true)](https://ci.appveyor.com/project/wezm/titlecase)
 [![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
 [![Documentation](https://docs.rs/titlecase/badge.svg)][crate-docs]
 
