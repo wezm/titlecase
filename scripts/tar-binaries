@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -e
+
+if [ -z "$1" ]; then
+  echo "Usage: tar-binaries VERSION"
+  echo "E.g. tar-binaries 0.1.0"
+  exit 1
+fi
+
+VERSION="$1"
+
+package() {
+  platform="$1"
+  binary="$2"
+  ext="$3"
+
+  bsdtar --auto-compress -cf "target/titlecase-${VERSION}-${platform}${ext}" -C "target/${platform}/release" "$binary"
+}
+
+set -- \
+arm-unknown-linux-gnueabihf
+
+for platform do
+  echo "$platform"
+  echo "target/${platform}/release/titlecase"
+  # arm-linux-gnueabihf-strip "target/${platform}/release/titlecase"
+  package "$platform" titlecase .tar.gz
+done
+
+set -- \
+x86_64-unknown-freebsd \
+x86_64-unknown-netbsd \
+x86_64-unknown-linux-musl
+
+for platform do
+  echo "$platform"
+  echo "target/${platform}/release/titlecase"
+  strip "target/${platform}/release/titlecase"
+  package "$platform" titlecase .tar.gz
+done
+
+# Windows
+platform=x86_64-pc-windows-gnu
+echo "$platform"
+echo "target/${platform}/release/titlecase"
+package "$platform" titlecase.exe .zip

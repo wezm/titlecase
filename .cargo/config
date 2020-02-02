@@ -1,0 +1,5 @@
+[target.x86_64-unknown-freebsd]
+linker = "x86_64-pc-freebsd12-gcc"
+
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
