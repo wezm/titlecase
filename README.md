@@ -2,9 +2,8 @@
 
 `titlecase` is a small tool that capitalizes English text [according to a
 style][style] defined by John Gruber for post titles on his website [Daring
-Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, and Windows. A
-dependency free, single-file binary is built for each supported platform for
-[every release][releases].
+Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
+Pre-built binaries are available for download below.
 
 [![Travis CI](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
 [![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
@@ -37,8 +36,15 @@ See the [crate documentation][crate-docs].
 
 ## Download
 
-[Pre-built `titlecase` binaries][releases] are available for Linux, macOS,
-FreeBSD, NetBSD, and Windows.
+Pre-built `titlecase` binaries are available:
+
+* [FreeBSD 12.1 amd64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-freebsd.tar.gz)
+* [NetBSD 7+ amd64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-netbsd.tar.gz)
+* [OpenBSD 6.6 amd64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-openbsd.tar.gz)
+* [Linux x86\_64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-linux-musl.tar.gz)
+* [Mac OS](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-apple-darwin.tar.gz)
+* [Raspberry Pi](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-arm-unknown-linux-gnueabihf.tar.gz)
+* [Windows](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-pc-windows-gnu.zip)
 
 ## Building
 
