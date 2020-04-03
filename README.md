@@ -1,9 +1,9 @@
 # Title Case (titlecase)
 
-`titlecase` is a small tool that capitalizes English text [according to a
-style][style] defined by John Gruber for post titles on his website [Daring
-Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
-Pre-built binaries are available for download below.
+`titlecase` is a small tool and library (crate) that capitalizes English text
+[according to a style][style] defined by John Gruber for post titles on his
+website [Daring Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD,
+OpenBSD, and Windows. Pre-built binaries are available for download below.
 
 [![Travis CI](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
 [![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
