@@ -2,10 +2,10 @@
 
 `titlecase` is a small tool and library (crate) that capitalizes English text
 [according to a style][style] defined by John Gruber for post titles on his
-website [Daring Fireball].  `titlecase` runs on Linux, macOS, FreeBSD, NetBSD,
-OpenBSD, and Windows. Pre-built binaries are available for download below.
+website [Daring Fireball]. `titlecase` should run on all platforms supported
+by Rust includig Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
 
-[![Travis CI](https://travis-ci.org/wezm/titlecase.svg?branch=master)](https://travis-ci.org/wezm/titlecase)
+[![Build Status](https://api.cirrus-ci.com/github/wezm/titlecase.svg)](https://cirrus-ci.com/github/wezm/titlecase)
 [![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
 [![Documentation](https://docs.rs/titlecase/badge.svg)][crate-docs]
 
@@ -22,7 +22,6 @@ Finding an Alternative to Mac OS X — Part 2
 
 % echo 'an example with small words and sub-phrases: "the example"' | titlecase
 An Example With Small Words and Sub-Phrases: "The Example"
-
 ```
 
 ## Command Line Usage
@@ -34,21 +33,9 @@ to **stdout**.
 
 See the [crate documentation][crate-docs].
 
-## Download
-
-Pre-built `titlecase` binaries are available:
-
-* [FreeBSD 12.1 amd64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-freebsd.tar.gz)
-* [NetBSD 7+ amd64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-netbsd.tar.gz)
-* [OpenBSD 6.6 amd64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-openbsd.tar.gz)
-* [Linux x86\_64](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-unknown-linux-musl.tar.gz)
-* [Mac OS](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-apple-darwin.tar.gz)
-* [Raspberry Pi](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-arm-unknown-linux-gnueabihf.tar.gz)
-* [Windows](https://releases.wezm.net/titlecase/1.1.0/titlecase-1.1.0-x86_64-pc-windows-gnu.zip)
-
 ## Building
 
-**Minimum Supported Rust Version:** 1.30.1
+**Minimum Supported Rust Version:** 1.40.0
 
 If you have a stable Rust compiler toolchain installed you can install
 the most recently released `titlecase` with cargo:
@@ -79,6 +66,5 @@ Pagaltzis], and [David Gouch].
 [style]: https://daringfireball.net/2008/05/title_case
 [Aristotle Pagaltzis]: http://plasmasturm.org/code/titlecase/
 [David Gouch]: http://individed.com/code/to-title-case/
-[releases]: https://github.com/wezm/titlecase/releases
 [MIT]: https://github.com/wezm/titlecase/blob/master/LICENSE
-[crate-docs]: https://docs.rs/crate/titlecase
+[crate-docs]: https://docs.rs/titlecase
