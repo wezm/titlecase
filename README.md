@@ -3,7 +3,7 @@
 `titlecase` is a small tool and library (crate) that capitalizes English text
 [according to a style][style] defined by John Gruber for post titles on his
 website [Daring Fireball]. `titlecase` should run on all platforms supported
-by Rust includig Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
+by Rust including Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
 
 [![Build Status](https://api.cirrus-ci.com/github/wezm/titlecase.svg)](https://cirrus-ci.com/github/wezm/titlecase)
 [![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
