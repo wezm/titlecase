@@ -1,0 +1,22 @@
+task:
+  name: Build (Alpine Linux)
+  container:
+    image: alpine:3.15
+    cpu: 8
+  matrix:
+    - environment:
+        RUST_VERSION: "1.40.0"
+    - environment:
+        RUST_VERSION: "stable"
+  environment:
+    RUSTFLAGS: "-C target-feature=-crt-static"
+    PATH: "$HOME/.cargo/bin:$PATH"
+  cargo_cache:
+    folder: $HOME/.cargo/registry
+    fingerprint_script: cat Cargo.toml
+  install_script:
+    - apk --update add curl git gcc musl-dev
+    - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain ${RUST_VERSION}
+  test_script:
+    - cargo test
+  before_cache_script: rm -rf $HOME/.cargo/registry/index
