@@ -170,14 +170,11 @@ fn has_internal_caps(word: &str) -> bool {
 }
 
 fn has_internal_slashes(word: &str) -> bool {
-    word.chars().skip(1).any(|chr| chr == '/')
+    word.len() > 0 && word[1..].contains('/')
 }
 
 fn starts_with_bracket(word: &str) -> bool {
-    match word.chars().next() {
-        Some('(') => true,
-        _ => false,
-    }
+    word.starts_with('(')
 }
 
 fn fix_small_word_at_start(text: &str) -> String {
