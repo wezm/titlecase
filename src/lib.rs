@@ -41,6 +41,8 @@
 extern crate lazy_static;
 extern crate regex;
 
+use std::borrow::Cow;
+
 use regex::{Captures, Regex};
 
 #[rustfmt::skip]
@@ -95,51 +97,46 @@ pub fn titlecase(input: &str) -> String {
         .expect("unable to compile regex");
     }
 
-    let trimmed_input = input.trim();
-
     // If input is yelling (all uppercase) make lowercase
-    let result = if !CONTAINS_LOWERCASE.is_match(trimmed_input) {
-        trimmed_input.to_lowercase()
+    let trimmed_input = input.trim();
+    let trimmed_input = if CONTAINS_LOWERCASE.is_match(trimmed_input) {
+        Cow::from(trimmed_input)
     } else {
-        trimmed_input.to_string()
+        Cow::from(trimmed_input.to_lowercase())
     };
 
-    let result = WORDS
-        .replace_all(&result, |captures: &Captures| {
-            let mut result = captures
-                .get(1)
-                .map(|cap| cap.as_str())
-                .unwrap_or("")
-                .to_owned();
-            let word = &captures[2];
+    let result = WORDS.replace_all(&trimmed_input, |captures: &Captures| {
+        let mut result = captures.get(1).map_or("", |cap| cap.as_str()).to_owned();
+        let word = &captures[2];
 
-            result.push_str(&if is_digital_resource(word) {
-                // pass through
-                word.to_owned()
-            } else if SMALL_RE.is_match(word) {
-                word.to_lowercase()
-            } else if starts_with_bracket(word) {
-                let rest = titlecase(&word.chars().skip(1).collect::<String>());
-                format!("({}", rest)
-            } else if has_internal_slashes(word) {
+        result.push_str(&if is_digital_resource(word) {
+            // pass through
+            Cow::from(word)
+        } else if SMALL_RE.is_match(word) {
+            Cow::from(word.to_lowercase())
+        } else if starts_with_bracket(word) {
+            let rest = titlecase(&word.chars().skip(1).collect::<String>());
+            Cow::from(format!("({}", rest))
+        } else if has_internal_slashes(word) {
+            Cow::from(
                 word.split('/')
                     .map(|sub_word| titlecase(sub_word))
                     .collect::<Vec<_>>()
-                    .join("/")
-            } else if has_internal_caps(word) {
-                // Preserve internal caps like iPhone or DuBois
-                word.to_owned()
-            } else {
-                ucfirst(word)
-            });
+                    .join("/"),
+            )
+        } else if has_internal_caps(word) {
+            // Preserve internal caps like iPhone or DuBois
+            Cow::from(word)
+        } else {
+            Cow::from(ucfirst(word))
+        });
 
-            result.push_str(captures.get(3).map(|cap| cap.as_str()).unwrap_or(""));
-            result
-        })
-        .to_string();
+        result.push_str(captures.get(3).map_or("", |cap| cap.as_str()));
+        result
+    });
 
     // Now deal with small words at the start and end of the text
-    fix_small_word_at_end(&fix_small_word_at_start(&result))
+    fix_small_word_at_end(&fix_small_word_at_start(&result)).into_owned()
 }
 
 // https://stackoverflow.com/a/38406885
@@ -147,7 +144,7 @@ fn ucfirst(input: &str) -> String {
     let mut chars = input.chars();
     match chars.next() {
         None => String::new(),
-        Some(f) => f.to_uppercase().collect::<String>() + chars.as_str(),
+        Some(f) => f.to_uppercase().chain(chars).collect(),
     }
 }
 
@@ -177,7 +174,7 @@ fn starts_with_bracket(word: &str) -> bool {
     word.starts_with('(')
 }
 
-fn fix_small_word_at_start(text: &str) -> String {
+fn fix_small_word_at_start(text: &str) -> Cow<'_, str> {
     lazy_static! {
         static ref RE: Regex = Regex::new(&format!(
             r#"(?x)
@@ -196,10 +193,9 @@ fn fix_small_word_at_start(text: &str) -> String {
         result.push_str(&ucfirst(&captures[2]));
         result
     })
-    .to_string()
 }
 
-fn fix_small_word_at_end(text: &str) -> String {
+fn fix_small_word_at_end(text: &str) -> Cow<'_, str> {
     lazy_static! {
         static ref RE: Regex = Regex::new(&format!(
             r#"(?x)
@@ -217,7 +213,6 @@ fn fix_small_word_at_end(text: &str) -> String {
         result.push_str(&captures[2]);
         result
     })
-    .to_string()
 }
 
 #[cfg(test)]
