@@ -1,7 +1,7 @@
 [package]
 name = "titlecase"
 description = "A tool and library that capitalizes text according to a style defined by John Gruber for post titles on his website Daring Fireball."
-version = "2.0.0"
+version = "2.1.0"
 authors = ["Wesley Moore <wes@wezm.net>"]
 
 documentation = "https://docs.rs/titlecase"
