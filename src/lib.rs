@@ -78,14 +78,14 @@ const SMALL_WORDS: &[&str] = &[
 /// ```
 pub fn titlecase(input: &str) -> String {
     lazy_static! {
-        static ref SMALL_RE: Regex = Regex::new(&format!(r"\A(?:{})\z", SMALL_WORDS.join("|")))
+        static ref SMALL_RE: Regex = Regex::new(&format!(r"(?i)\A(?:{})\z", SMALL_WORDS.join("|")))
             .expect("unable to compile small words regex");
         static ref CONTAINS_LOWERCASE: Regex =
             Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
         static ref WORDS: Regex = Regex::new(
             r"(?x)
              (_*)
-             ([\w'’.:/@\[\]/()]+)
+             ([\w'’.:/@\[\]/()&]+)
              (_*)",
         )
         .expect("unable to compile regex");
@@ -423,5 +423,11 @@ mod tests {
         man_in_the_machine,
         "Jonathan Kim on Alex Gibney’s ‘Steve Jobs: The man in the machine’",
         "Jonathan Kim on Alex Gibney’s ‘Steve Jobs: The Man in the Machine’"
+    );
+
+    testcase!(
+        lower_small_words,
+        "Way Of The Dragon makes Of In An A lowercase",
+        "Way of the Dragon Makes of in an a Lowercase"
     );
 }
