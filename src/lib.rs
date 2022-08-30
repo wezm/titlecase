@@ -4,15 +4,6 @@
 //! [Daring Fireball]: https://daringfireball.net/
 //! [style]: https://daringfireball.net/2008/05/title_case
 //!
-//! ## Usage
-//!
-//! Add the crate to your `Cargo.toml`:
-//!
-//! ```toml
-//! [dependencies]
-//! titlecase = "1.0"
-//! ```
-//!
 //! ## Example
 //!
 //! ```
