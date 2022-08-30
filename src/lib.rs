@@ -66,6 +66,10 @@ const SMALL_WORDS: &[&str] = &[
     "vs[.]?",
 ];
 
+lazy_static! {
+    static ref SMALL_WORDS_PIPE: String = SMALL_WORDS.join("|");
+}
+
 /// Returns `input` in title case.
 ///
 /// ### Example
@@ -78,7 +82,7 @@ const SMALL_WORDS: &[&str] = &[
 /// ```
 pub fn titlecase(input: &str) -> String {
     lazy_static! {
-        static ref SMALL_RE: Regex = Regex::new(&format!(r"(?i)\A(?:{})\z", SMALL_WORDS.join("|")))
+        static ref SMALL_RE: Regex = Regex::new(&format!(r"(?i)\A(?:{})\z", *SMALL_WORDS_PIPE))
             .expect("unable to compile small words regex");
         static ref CONTAINS_LOWERCASE: Regex =
             Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
@@ -185,7 +189,7 @@ fn fix_small_word_at_start(text: &str) -> String {
             |  \x20['"“‘(\[]\x20* )  # or of inserted subphrase...
             ( {small_re} ) \b        # ... followed by small word
             "#,
-            small_re = SMALL_WORDS.join("|")
+            small_re = *SMALL_WORDS_PIPE
         ))
         .expect("unable to compile fix_small_word_at_start regex");
     }
@@ -206,7 +210,7 @@ fn fix_small_word_at_end(text: &str) -> String {
             ( [[:punct:]]* \z     # ... at the end of the title...
             |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
             "#,
-            small_re = SMALL_WORDS.join("|")
+            small_re = *SMALL_WORDS_PIPE
         ))
         .expect("unable to compile fix_small_word_at_end regex");
     }
