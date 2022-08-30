@@ -118,12 +118,7 @@ pub fn titlecase(input: &str) -> String {
             let rest = titlecase(&word.chars().skip(1).collect::<String>());
             Cow::from(format!("({}", rest))
         } else if has_internal_slashes(word) {
-            Cow::from(
-                word.split('/')
-                    .map(|sub_word| titlecase(sub_word))
-                    .collect::<Vec<_>>()
-                    .join("/"),
-            )
+            Cow::from(word.split('/').map(titlecase).collect::<Vec<_>>().join("/"))
         } else if has_internal_caps(word) {
             // Preserve internal caps like iPhone or DuBois
             Cow::from(word)
@@ -167,7 +162,7 @@ fn has_internal_caps(word: &str) -> bool {
 }
 
 fn has_internal_slashes(word: &str) -> bool {
-    word.len() > 0 && word[1..].contains('/')
+    !word.is_empty() && word[1..].contains('/')
 }
 
 fn starts_with_bracket(word: &str) -> bool {

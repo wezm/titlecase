@@ -5,7 +5,7 @@ use std::io::{self, BufRead};
 use titlecase::titlecase;
 
 fn main() {
-    match env::args().nth(1).as_ref().map(String::as_str) {
+    match env::args().nth(1).as_deref() {
         Some("-h") | Some("--help") => return help(),
         Some("-v") | Some("--version") => return version(),
         Some(option) => return eprintln!("unknown option {}", option),
