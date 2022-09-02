@@ -106,7 +106,7 @@ pub fn titlecase(input: &str) -> String {
         } else if SMALL_RE.is_match(word) {
             Cow::from(word.to_lowercase())
         } else if starts_with_bracket(word) {
-            let rest = titlecase(&word.chars().skip(1).collect::<String>());
+            let rest = titlecase(&word[1..]);
             Cow::from(format!("({}", rest))
         } else if has_internal_slashes(word) {
             Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
