@@ -1,5 +1,3 @@
-extern crate titlecase;
-
 use std::env;
 use std::io::{self, BufRead};
 use titlecase::titlecase;

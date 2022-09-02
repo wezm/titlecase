@@ -28,8 +28,6 @@
 
 #[macro_use]
 extern crate lazy_static;
-extern crate joinery;
-extern crate regex;
 
 use std::borrow::Cow;
 
