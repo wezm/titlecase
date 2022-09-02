@@ -10,9 +10,7 @@
 //! use titlecase::titlecase;
 //!
 //! let text = "a sample title to capitalize: an example";
-//! let capitalized_text =  "A Sample Title to Capitalize: An Example".to_owned();
-//!
-//! assert_eq!(titlecase(text), capitalized_text);
+//! assert_eq!(titlecase(text), "A Sample Title to Capitalize: An Example");
 //! ```
 //!
 //! ## Style
@@ -30,10 +28,12 @@
 
 #[macro_use]
 extern crate lazy_static;
+extern crate joinery;
 extern crate regex;
 
 use std::borrow::Cow;
 
+use joinery::JoinableIterator;
 use regex::{Captures, Regex};
 
 #[rustfmt::skip]
@@ -109,7 +109,7 @@ pub fn titlecase(input: &str) -> String {
             let rest = titlecase(&word.chars().skip(1).collect::<String>());
             Cow::from(format!("({}", rest))
         } else if has_internal_slashes(word) {
-            Cow::from(word.split('/').map(titlecase).collect::<Vec<_>>().join("/"))
+            Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
         } else if has_internal_caps(word) {
             // Preserve internal caps like iPhone or DuBois
             Cow::from(word)
