@@ -1,13 +1,9 @@
 Changelog
 =========
 
-<!--
-
 ## [2.2.0](https://github.com/wezm/titlecase/releases/tag/v2.2.0)
 
-- Avoid some more intermediate allocations
-
--->
+- Further reduce allocations and optimise regex use
 
 ## [2.1.0](https://github.com/wezm/titlecase/releases/tag/v2.1.0)
 
