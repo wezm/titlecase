@@ -73,10 +73,6 @@ lazy_static! {
 /// ```
 pub fn titlecase(input: &str) -> String {
     lazy_static! {
-        static ref SMALL_RE: Regex = Regex::new(&format!(r"(?i)\A(?:{})\z", *SMALL_WORDS_PIPE))
-            .expect("unable to compile small words regex");
-        static ref CONTAINS_LOWERCASE: Regex =
-            Regex::new(r"[[:lower:]]").expect("unable to compile lowercase regex");
         static ref WORDS: Regex = Regex::new(
             r"(?x)
              (_*)
@@ -88,7 +84,7 @@ pub fn titlecase(input: &str) -> String {
 
     // If input is yelling (all uppercase) make lowercase
     let trimmed_input = input.trim();
-    let trimmed_input = if CONTAINS_LOWERCASE.is_match(trimmed_input) {
+    let trimmed_input = if trimmed_input.chars().any(|ch| ch.is_lowercase()) {
         Cow::from(trimmed_input)
     } else {
         Cow::from(trimmed_input.to_lowercase())
@@ -97,30 +93,40 @@ pub fn titlecase(input: &str) -> String {
     let result = WORDS.replace_all(&trimmed_input, |captures: &Captures| {
         let mut result = captures.get(1).map_or("", |cap| cap.as_str()).to_owned();
         let word = &captures[2];
-
-        result.push_str(&if is_digital_resource(word) {
-            // pass through
-            Cow::from(word)
-        } else if SMALL_RE.is_match(word) {
-            Cow::from(word.to_lowercase())
-        } else if starts_with_bracket(word) {
-            let rest = titlecase(&word[1..]);
-            Cow::from(format!("({}", rest))
-        } else if has_internal_slashes(word) {
-            Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
-        } else if has_internal_caps(word) {
-            // Preserve internal caps like iPhone or DuBois
-            Cow::from(word)
-        } else {
-            Cow::from(ucfirst(word))
-        });
-
+        result.push_str(&process_word(word));
         result.push_str(captures.get(3).map_or("", |cap| cap.as_str()));
         result
     });
 
     // Now deal with small words at the start and end of the text
     fix_small_word_at_end(&fix_small_word_at_start(&result)).into_owned()
+}
+
+fn process_word(word: &str) -> Cow<'_, str> {
+    lazy_static! {
+        static ref SMALL_RE: Regex = Regex::new(&format!(r"\A(?:{})\z", *SMALL_WORDS_PIPE))
+            .expect("unable to compile small words regex");
+    }
+
+    if is_digital_resource(word) {
+        // pass through
+        return Cow::from(word);
+    }
+
+    let lower_word = word.to_lowercase();
+    if SMALL_RE.is_match(&lower_word) {
+        Cow::from(lower_word)
+    } else if starts_with_bracket(word) {
+        let rest = titlecase(&word[1..]);
+        Cow::from(format!("({}", rest))
+    } else if has_internal_slashes(word) {
+        Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
+    } else if has_internal_caps(word) {
+        // Preserve internal caps like iPhone or DuBois
+        Cow::from(word)
+    } else {
+        Cow::from(ucfirst(word))
+    }
 }
 
 // https://stackoverflow.com/a/38406885
