@@ -117,7 +117,7 @@ fn process_word(word: &str) -> Cow<'_, str> {
     if SMALL_RE.is_match(&lower_word) {
         Cow::from(lower_word)
     } else if starts_with_bracket(word) {
-        let rest = titlecase(&word[1..]);
+        let rest = titlecase(&word.chars().skip(1).collect::<String>());
         Cow::from(format!("({}", rest))
     } else if has_internal_slashes(word) {
         Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
@@ -157,7 +157,7 @@ fn has_internal_caps(word: &str) -> bool {
 }
 
 fn has_internal_slashes(word: &str) -> bool {
-    !word.is_empty() && word[1..].contains('/')
+    !word.is_empty() && word.chars().skip(1).collect::<String>().contains('/')
 }
 
 fn starts_with_bracket(word: &str) -> bool {
