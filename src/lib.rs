@@ -157,7 +157,7 @@ fn has_internal_caps(word: &str) -> bool {
 }
 
 fn has_internal_slashes(word: &str) -> bool {
-    !word.is_empty() && word[1..].contains('/')
+    !word.is_empty() && word.chars().skip(1).any(|chr| chr == '/')
 }
 
 fn starts_with_bracket(word: &str) -> bool {
@@ -415,5 +415,11 @@ mod tests {
         lower_small_words,
         "Way Of The Dragon makes Of In An A lowercase",
         "Way of the Dragon Makes of in an a Lowercase"
+    );
+
+    testcase!(
+        small_greek_letters,
+        "μ",
+        "Μ"
     );
 }
