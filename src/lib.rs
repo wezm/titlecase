@@ -417,9 +417,5 @@ mod tests {
         "Way of the Dragon Makes of in an a Lowercase"
     );
 
-    testcase!(
-        small_greek_letters,
-        "μ",
-        "Μ"
-    );
+    testcase!(small_greek_letters, "μ", "Μ");
 }
