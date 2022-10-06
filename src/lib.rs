@@ -117,7 +117,7 @@ fn process_word(word: &str) -> Cow<'_, str> {
     if SMALL_RE.is_match(&lower_word) {
         Cow::from(lower_word)
     } else if starts_with_bracket(word) {
-        let rest = titlecase(&word.chars().skip(1).collect::<String>());
+        let rest = titlecase(&word[1..]);
         Cow::from(format!("({}", rest))
     } else if has_internal_slashes(word) {
         Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
@@ -415,5 +415,11 @@ mod tests {
         lower_small_words,
         "Way Of The Dragon makes Of In An A lowercase",
         "Way of the Dragon Makes of in an a Lowercase"
+    );
+
+    testcase!(
+        small_greek_letters,
+        "μ",
+        "Μ"
     );
 }
