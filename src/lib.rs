@@ -157,7 +157,7 @@ fn has_internal_caps(word: &str) -> bool {
 }
 
 fn has_internal_slashes(word: &str) -> bool {
-    !word.is_empty() && word.chars().skip(1).collect::<String>().contains('/')
+    !word.is_empty() && word.chars().skip(1).any(|chr| chr == '/')
 }
 
 fn starts_with_bracket(word: &str) -> bool {
