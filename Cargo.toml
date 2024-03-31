@@ -16,4 +16,4 @@ keywords = ["title", "case", "capitalization", "capitalisation", "capitalize"]
 categories = ["text-processing"]
 
 [dependencies]
-regex = "1.10"
+regex = { version = "1.10", default-features = false, features = ["std", "perf", "unicode-perl"]}
