@@ -35,7 +35,7 @@ See the [crate documentation][crate-docs].
 
 ## Building
 
-**Minimum Supported Rust Version:** 1.40.0
+**Minimum Supported Rust Version:** 1.70.0
 
 If you have a stable Rust compiler toolchain installed you can install
 the most recently released `titlecase` with cargo:
