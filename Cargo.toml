@@ -17,4 +17,3 @@ categories = ["text-processing"]
 [dependencies]
 lazy_static = "1.0"
 regex = "1.5"
-joinery = "< 3.0" # 3.0+ requires 2021 edition, which our MSRV does not support
