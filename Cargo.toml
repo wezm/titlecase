@@ -2,7 +2,7 @@
 name = "titlecase"
 description = "A tool and library that capitalizes text according to a style defined by John Gruber for post titles on his website Daring Fireball."
 version = "2.2.1"
-edition = "2018"
+edition = "2021"
 authors = ["Wesley Moore <wes@wezm.net>"]
 rust-version = "1.70.0"
 
