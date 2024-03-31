@@ -5,7 +5,7 @@ task:
     cpu: 8
   matrix:
     - environment:
-        RUST_VERSION: "1.40.0"
+        RUST_VERSION: "1.70.0"
     - environment:
         RUST_VERSION: "stable"
   environment:
