@@ -12,12 +12,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "joinery"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72167d68f5fce3b8655487b8038691a3c9984ee769590f93f2a631f4ad64e4f5"
-
-[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -44,6 +38,5 @@ checksum = "49b3de9ec5dc0a3417da371aab17d729997c15010e7fd24ff707773a33bddb64"
 name = "titlecase"
 version = "2.2.1"
 dependencies = [
- "joinery",
  "regex",
 ]
