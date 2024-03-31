@@ -26,10 +26,8 @@
 //! * Don't interfere with terms like "Q&A", or "AT&T".
 //! * Capitalize small words after a colon.
 
-#[macro_use]
-extern crate lazy_static;
-
 use std::borrow::Cow;
+use std::sync::OnceLock;
 
 use joinery::JoinableIterator;
 use regex::{Captures, Regex};
@@ -57,8 +55,24 @@ const SMALL_WORDS: &[&str] = &[
     "vs[.]?",
 ];
 
-lazy_static! {
-    static ref SMALL_WORDS_PIPE: String = SMALL_WORDS.join("|");
+#[inline]
+fn get_small_words_pipe() -> &'static String {
+    static SMALL_WORDS_PIPE: OnceLock<String> = OnceLock::new();
+    SMALL_WORDS_PIPE.get_or_init(|| SMALL_WORDS.join("|"))
+}
+
+#[inline]
+fn get_words_regex() -> &'static Regex {
+    static WORDS: OnceLock<Regex> = OnceLock::new();
+    WORDS.get_or_init(|| {
+        Regex::new(
+            r"(?x)
+             (_*)
+             ([\w'’.:/@\[\]/()&]+)
+             (_*)",
+        )
+        .expect("unable to compile regex")
+    })
 }
 
 /// Returns `input` in title case.
@@ -72,16 +86,6 @@ lazy_static! {
 /// assert_eq!(titlecase(text), "A Sample Title to Capitalize: An Example");
 /// ```
 pub fn titlecase(input: &str) -> String {
-    lazy_static! {
-        static ref WORDS: Regex = Regex::new(
-            r"(?x)
-             (_*)
-             ([\w'’.:/@\[\]/()&]+)
-             (_*)",
-        )
-        .expect("unable to compile regex");
-    }
-
     // If input is yelling (all uppercase) make lowercase
     let trimmed_input = input.trim();
     let trimmed_input = if trimmed_input.chars().any(|ch| ch.is_lowercase()) {
@@ -90,7 +94,7 @@ pub fn titlecase(input: &str) -> String {
         Cow::from(trimmed_input.to_lowercase())
     };
 
-    let result = WORDS.replace_all(&trimmed_input, |captures: &Captures| {
+    let result = get_words_regex().replace_all(&trimmed_input, |captures: &Captures| {
         let mut result = captures.get(1).map_or("", |cap| cap.as_str()).to_owned();
         let word = &captures[2];
         result.push_str(&process_word(word));
@@ -102,19 +106,23 @@ pub fn titlecase(input: &str) -> String {
     fix_small_word_at_end(&fix_small_word_at_start(&result)).into_owned()
 }
 
-fn process_word(word: &str) -> Cow<'_, str> {
-    lazy_static! {
-        static ref SMALL_RE: Regex = Regex::new(&format!(r"\A(?:{})\z", *SMALL_WORDS_PIPE))
-            .expect("unable to compile small words regex");
-    }
+#[inline]
+fn get_small_regex() -> &'static Regex {
+    static SMALL_RE: OnceLock<Regex> = OnceLock::new();
+    SMALL_RE.get_or_init(|| {
+        Regex::new(&format!(r"\A(?:{})\z", *get_small_words_pipe()))
+            .expect("unable to compile small words regex")
+    })
+}
 
+fn process_word(word: &str) -> Cow<'_, str> {
     if is_digital_resource(word) {
         // pass through
         return Cow::from(word);
     }
 
     let lower_word = word.to_lowercase();
-    if SMALL_RE.is_match(&lower_word) {
+    if get_small_regex().is_match(&lower_word) {
         Cow::from(lower_word)
     } else if starts_with_bracket(word) {
         let rest = titlecase(&word[1..]);
@@ -138,17 +146,22 @@ fn ucfirst(input: &str) -> String {
     }
 }
 
-fn is_digital_resource(word: &str) -> bool {
-    lazy_static! {
-        static ref RE: Regex = Regex::new(
+#[inline]
+fn is_digital_resource_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(
             r"(?x)
             \A
             (?: [/\\] [[:alpha:]]+ [-_[:alpha:]/\\]+ |   # file path or
               [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ )  # URL, domain, or email",
         )
-        .expect("unable to compile file/url regex");
-    }
-    RE.is_match(word)
+        .expect("unable to compile file/url regex")
+    })
+}
+
+fn is_digital_resource(word: &str) -> bool {
+    is_digital_resource_regex().is_match(word)
 }
 
 // E.g. iPhone or DuBois
@@ -164,41 +177,49 @@ fn starts_with_bracket(word: &str) -> bool {
     word.starts_with('(')
 }
 
-fn fix_small_word_at_start(text: &str) -> Cow<'_, str> {
-    lazy_static! {
-        static ref RE: Regex = Regex::new(&format!(
+#[inline]
+fn fix_small_word_at_start_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(&format!(
             r#"(?x)
             ( \A [[:punct:]]*        # start of title...
             |  [:.;?!]\x20+          # or of subsentence...
             |  \x20['"“‘(\[]\x20* )  # or of inserted subphrase...
             ( {small_re} ) \b        # ... followed by small word
             "#,
-            small_re = *SMALL_WORDS_PIPE
+            small_re = *get_small_words_pipe()
         ))
-        .expect("unable to compile fix_small_word_at_start regex");
-    }
+        .expect("unable to compile fix_small_word_at_start regex")
+    })
+}
 
-    RE.replace_all(text, |captures: &Captures| {
+fn fix_small_word_at_start(text: &str) -> Cow<'_, str> {
+    fix_small_word_at_start_regex().replace_all(text, |captures: &Captures| {
         let mut result = captures[1].to_owned();
         result.push_str(&ucfirst(&captures[2]));
         result
     })
 }
 
-fn fix_small_word_at_end(text: &str) -> Cow<'_, str> {
-    lazy_static! {
-        static ref RE: Regex = Regex::new(&format!(
+#[inline]
+fn fix_small_word_at_end_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(&format!(
             r#"(?x)
             \b ( {small_re} )     # small word...
             ( [[:punct:]]* \z     # ... at the end of the title...
             |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
             "#,
-            small_re = *SMALL_WORDS_PIPE
+            small_re = *get_small_words_pipe()
         ))
-        .expect("unable to compile fix_small_word_at_end regex");
-    }
+        .expect("unable to compile fix_small_word_at_end regex")
+    })
+}
 
-    RE.replace_all(text, |captures: &Captures| {
+fn fix_small_word_at_end(text: &str) -> Cow<'_, str> {
+    fix_small_word_at_end_regex().replace_all(text, |captures: &Captures| {
         let mut result = ucfirst(&captures[1]);
         result.push_str(&captures[2]);
         result
