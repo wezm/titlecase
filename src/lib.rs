@@ -54,14 +54,13 @@ const SMALL_WORDS: &[&str] = &[
     "vs[.]?",
 ];
 
-#[inline]
-fn get_small_words_pipe() -> &'static String {
+fn small_words_alternation() -> &'static String {
     static SMALL_WORDS_PIPE: OnceLock<String> = OnceLock::new();
     SMALL_WORDS_PIPE.get_or_init(|| SMALL_WORDS.join("|"))
 }
 
 #[inline]
-fn get_words_regex() -> &'static Regex {
+fn words_regex() -> &'static Regex {
     static WORDS: OnceLock<Regex> = OnceLock::new();
     WORDS.get_or_init(|| {
         Regex::new(
@@ -70,7 +69,7 @@ fn get_words_regex() -> &'static Regex {
              ([\w'’.:/@\[\]/()&]+)
              (_*)",
         )
-        .expect("unable to compile regex")
+        .expect("unable to compile words regex")
     })
 }
 
@@ -93,7 +92,7 @@ pub fn titlecase(input: &str) -> String {
         Cow::from(trimmed_input.to_lowercase())
     };
 
-    let result = get_words_regex().replace_all(&trimmed_input, |captures: &Captures| {
+    let result = words_regex().replace_all(&trimmed_input, |captures: &Captures| {
         let mut result = captures.get(1).map_or("", |cap| cap.as_str()).to_owned();
         let word = &captures[2];
         result.push_str(&process_word(word));
@@ -106,10 +105,10 @@ pub fn titlecase(input: &str) -> String {
 }
 
 #[inline]
-fn get_small_regex() -> &'static Regex {
+fn small_words_regex() -> &'static Regex {
     static SMALL_RE: OnceLock<Regex> = OnceLock::new();
     SMALL_RE.get_or_init(|| {
-        Regex::new(&format!(r"\A(?:{})\z", *get_small_words_pipe()))
+        Regex::new(&format!(r"\A(?:{})\z", *small_words_alternation()))
             .expect("unable to compile small words regex")
     })
 }
@@ -121,7 +120,7 @@ fn process_word(word: &str) -> Cow<'_, str> {
     }
 
     let lower_word = word.to_lowercase();
-    if get_small_regex().is_match(&lower_word) {
+    if small_words_regex().is_match(&lower_word) {
         Cow::from(lower_word)
     } else if starts_with_bracket(word) {
         let rest = titlecase(&word[1..]);
@@ -193,7 +192,7 @@ fn fix_small_word_at_start_regex() -> &'static Regex {
             |  \x20['"“‘(\[]\x20* )  # or of inserted subphrase...
             ( {small_re} ) \b        # ... followed by small word
             "#,
-            small_re = *get_small_words_pipe()
+            small_re = *small_words_alternation()
         ))
         .expect("unable to compile fix_small_word_at_start regex")
     })
@@ -217,7 +216,7 @@ fn fix_small_word_at_end_regex() -> &'static Regex {
             ( [[:punct:]]* \z     # ... at the end of the title...
             |   ['"’”)\]] \x20 )  # ... or of an inserted subphrase?
             "#,
-            small_re = *get_small_words_pipe()
+            small_re = *small_words_alternation()
         ))
         .expect("unable to compile fix_small_word_at_end regex")
     })
