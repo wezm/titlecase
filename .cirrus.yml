@@ -1,21 +1,34 @@
 task:
   name: Build (Alpine Linux)
   container:
-    image: alpine:3.15
-    cpu: 8
-  matrix:
-    - environment:
-        RUST_VERSION: "1.70.0"
-    - environment:
-        RUST_VERSION: "stable"
+    image: alpine:3.19
+    cpu: 4
   environment:
-    RUSTFLAGS: "-C target-feature=-crt-static"
+    RUST_VERSION: "stable"
     PATH: "$HOME/.cargo/bin:$PATH"
   cargo_cache:
     folder: $HOME/.cargo/registry
     fingerprint_script: cat Cargo.toml
   install_script:
     - apk --update add curl git gcc musl-dev
+    - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain ${RUST_VERSION}
+  test_script:
+    - cargo test
+  before_cache_script: rm -rf $HOME/.cargo/registry/index
+
+task:
+  name: Build (Debian Linux)
+  container:
+    image: debian:12-slim
+    cpu: 4
+  environment:
+    RUST_VERSION: "1.70.0"
+    PATH: "$HOME/.cargo/bin:$PATH"
+  cargo_cache:
+    folder: $HOME/.cargo/registry
+    fingerprint_script: cat Cargo.lock
+  install_script:
+    - apt-get update && apt-get install -y --no-install-recommends git ca-certificates curl gcc libc6-dev
     - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain ${RUST_VERSION}
   test_script:
     - cargo test
