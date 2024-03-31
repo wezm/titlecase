@@ -443,4 +443,10 @@ mod tests {
     );
 
     testcase!(small_greek_letters, "μ", "Μ");
+
+    testcase!(
+        japanese,
+        "発売時の名称は「apple macintosh」であったが、後に拡張版のMacintosh 512Kが発売された段階で「macintosh 128K」と再命名された。test",
+        "発売時の名称は「Apple Macintosh」であったが、後に拡張版のMacintosh 512Kが発売された段階で「Macintosh 128K」と再命名された。Test"
+    );
 }
