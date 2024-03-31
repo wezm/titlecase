@@ -31,7 +31,6 @@ extern crate lazy_static;
 
 use std::borrow::Cow;
 
-use joinery::JoinableIterator;
 use regex::{Captures, Regex};
 
 #[rustfmt::skip]
@@ -120,7 +119,13 @@ fn process_word(word: &str) -> Cow<'_, str> {
         let rest = titlecase(&word[1..]);
         Cow::from(format!("({}", rest))
     } else if has_internal_slashes(word) {
-        Cow::from(word.split('/').map(titlecase).join_with('/').to_string())
+        Cow::from(
+            word.split('/')
+                .map(titlecase)
+                // TODO: Awaiting rust iter.intersperse('/');
+                .collect::<Vec<String>>()
+                .join("/"),
+        )
     } else if has_internal_caps(word) {
         // Preserve internal caps like iPhone or DuBois
         Cow::from(word)
