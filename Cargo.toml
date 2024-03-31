@@ -4,6 +4,7 @@ description = "A tool and library that capitalizes text according to a style def
 version = "2.2.1"
 edition = "2018"
 authors = ["Wesley Moore <wes@wezm.net>"]
+rust-version = "1.70.0"
 
 documentation = "https://docs.rs/titlecase"
 repository = "https://github.com/wezm/titlecase"
