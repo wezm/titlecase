@@ -8,10 +8,14 @@ by Rust including Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
 [![Build Status](https://api.cirrus-ci.com/github/wezm/titlecase.svg)](https://cirrus-ci.com/github/wezm/titlecase)
 [![crates.io](https://img.shields.io/crates/v/titlecase.svg)](https://crates.io/crates/titlecase)
 [![Documentation](https://docs.rs/titlecase/badge.svg)][crate-docs]
+[![License](https://img.shields.io/crates/l/titlecase.svg)][MIT]
 
-`titlecase` is licensed under the [MIT license][MIT].
+## Command Line Usage
 
-## Examples
+`titlecase` reads lines of text from **stdin** and prints title cased versions
+to **stdout**.
+
+### Examples
 
 ```
 % echo 'Being productive on linux' | titlecase
@@ -24,25 +28,33 @@ Finding an Alternative to Mac OS X — Part 2
 An Example With Small Words and Sub-Phrases: "The Example"
 ```
 
-## Command Line Usage
+## Install
 
-`titlecase` reads lines of text from **stdin** and prints title cased versions
-to **stdout**.
+### Pre-compiled binaries
+
+Pre-compiled binaries are available for a some platforms:
+
+* [FreeBSD 13+ amd64](https://releases.wezm.net/titlecase/3.0.0/titlecase-3.0.0-amd64-unknown-freebsd.tar.gz)
+* [Linux x86\_64](https://releases.wezm.net/titlecase/3.0.0/titlecase-3.0.0-x86_64-unknown-linux-musl.tar.gz)
+* [MacOS Universal](https://releases.wezm.net/titlecase/3.0.0/titlecase-3.0.0-universal-apple-darwin.tar.gz)
+* [Windows x86\_64](https://releases.wezm.net/titlecase/3.0.0/titlecase-3.0.0-x86_64-pc-windows-msvc.zip)
+
+Example to download and extract a binary:
+
+    curl https://releases.wezm.net/titlecase/3.0.0/titlecase-3.0.0-x86_64-unknown-linux-musl.tar.gz | tar zxf -
+
+### From Source
+
+If you have a stable [Rust compiler toolchain][rustup] installed you can
+install the most recently released `titlecase` with cargo:
+
+    cargo install titlecase
 
 ## Usage as a Rust Crate
 
-See the [crate documentation][crate-docs].
-
-## Building
-
 **Minimum Supported Rust Version:** 1.70.0
 
-If you have a stable Rust compiler toolchain installed you can install
-the most recently released `titlecase` with cargo:
-
-```
-% cargo install titlecase
-```
+See the [crate documentation][crate-docs].
 
 ## Style
 
@@ -62,9 +74,10 @@ Instead of simply capitalizing each word `titlecase` does the following
 This tool makes use of prior work by [John Gruber][style], [Aristotle
 Pagaltzis], and [David Gouch].
 
-[Daring Fireball]: https://daringfireball.net/
-[style]: https://daringfireball.net/2008/05/title_case
 [Aristotle Pagaltzis]: http://plasmasturm.org/code/titlecase/
+[crate-docs]: https://docs.rs/titlecase
+[Daring Fireball]: https://daringfireball.net/
 [David Gouch]: http://individed.com/code/to-title-case/
 [MIT]: https://github.com/wezm/titlecase/blob/master/LICENSE
-[crate-docs]: https://docs.rs/titlecase
+[rustup]: https://www.rust-lang.org/tools/install
+[style]: https://daringfireball.net/2008/05/title_case

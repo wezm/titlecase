@@ -1,6 +1,14 @@
 Changelog
 =========
 
+## [3.0.0](https://github.com/wezm/titlecase/releases/tag/v3.0.0)
+
+- Update regex dependency [#20](https://github.com/wezm/titlecase/pull/20).
+  Slim down `regex` crate default features.
+- Remove joinery dependency [#19](https://github.com/wezm/titlecase/pull/19)
+- Use OnceLock instead of LazyStatic [#18](https://github.com/wezm/titlecase/pull/18)
+- Minimum Supported Rust Version is now 1.70.0 [#17](https://github.com/wezm/titlecase/pull/17)
+
 ## [2.2.0](https://github.com/wezm/titlecase/releases/tag/v2.2.0)
 
 - Further reduce allocations and optimise regex use
