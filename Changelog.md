@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## [3.1.0](https://github.com/wezm/titlecase/releases/tag/v3.1.0)
+
+- Add wasm build [#23](https://github.com/wezm/titlecase/pull/23).
+
 ## [3.0.0](https://github.com/wezm/titlecase/releases/tag/v3.0.0)
 
 - Update regex dependency [#20](https://github.com/wezm/titlecase/pull/20).
