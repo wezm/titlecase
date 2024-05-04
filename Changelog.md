@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## [3.1.1](https://github.com/wezm/titlecase/releases/tag/v3.1.1)
+
+- Tweak Cargo metadata to make crates.io accept it
+
 ## [3.1.0](https://github.com/wezm/titlecase/releases/tag/v3.1.0)
 
 - Add wasm build [#23](https://github.com/wezm/titlecase/pull/23).
