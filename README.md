@@ -10,6 +10,10 @@ by Rust including Linux, macOS, FreeBSD, NetBSD, OpenBSD, and Windows.
 [![Documentation](https://docs.rs/titlecase/badge.svg)][crate-docs]
 [![License](https://img.shields.io/crates/l/titlecase.svg)][MIT]
 
+## Try Online
+
+<https://7bit.org/titlecase/>
+
 ## Command Line Usage
 
 `titlecase` reads lines of text from **stdin** and prints title cased versions
@@ -56,6 +60,27 @@ install the most recently released `titlecase` with cargo:
 
 See the [crate documentation][crate-docs].
 
+## Building for WebAssembly
+
+### Pre-requisites
+
+- Rust 1.73.0+
+- Rust `wasm32-unknown-unknown` target
+  (`rustup target add wasm32-unknown-unknown` or `rust-wasm` package on Chimera Linux)
+- [wasm-bindgen]
+  (`wasm-bindgen` package on Arch, or `cargo install wasm-bindgen-cli --version 0.2.92`)
+- `make` (GNU or BSD should work)
+
+### Building
+
+There is a `Makefile` that automates building for WebAssembly.
+
+    make
+
+The output is put into a `wasm` directory. See
+<https://github.com/wezm/7bit.org/tree/main/public/titlecase> for an
+example that uses the wasm build.
+
 ## Style
 
 Instead of simply capitalizing each word `titlecase` does the following
@@ -81,3 +106,4 @@ Pagaltzis], and [David Gouch].
 [MIT]: https://github.com/wezm/titlecase/blob/master/LICENSE
 [rustup]: https://www.rust-lang.org/tools/install
 [style]: https://daringfireball.net/2008/05/title_case
+[wasm-bindgen]: https://github.com/rustwasm/wasm-bindgen

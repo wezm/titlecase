@@ -1,6 +1,7 @@
 env:
   PATH: "$HOME/.cargo/bin:$PATH"
   RUST_VERSION: '1.70.0' # Needs to be <= FreeBSD version
+  WASM_VERSION: '1.73.0'
   AWS_ACCESS_KEY_ID: ENCRYPTED[5c3f77d4196c6b47340a4f07f6dec015753bf26df6f7323467217282d614988db7568c67785129a46a6de7fe8117c2af]
   AWS_SECRET_ACCESS_KEY: ENCRYPTED[4c49da1c017860dd66710621efb3edb855c7da0dcad438a7bf9a3dbf41adfd15905cbe14df679ba2a83cff5a9ec2afdc]
 
@@ -46,6 +47,22 @@ task:
       tar zcf "$tarball" -C target/x86_64-unknown-linux-musl/release titlecase
       ~/bin/upload-to-s3 -b releases.wezm.net "$tarball" "titlecase/$tag/$tarball"
     fi
+  before_cache_script: rm -rf $HOME/.cargo/registry/index
+
+task:
+  name: Build (Web Assembly)
+  container:
+    image: debian:12-slim
+    cpu: 4
+  cargo_cache:
+    folder: $HOME/.cargo/registry
+    fingerprint_script: cat Cargo.lock
+  install_script:
+    - apt-get update && apt-get install -y --no-install-recommends git ca-certificates curl gcc libc6-dev
+    - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain ${WASM_VERSION}
+    - rustup target add wasm32-unknown-unknown
+  build_script:
+    - cargo build --lib --target wasm32-unknown-unknown
   before_cache_script: rm -rf $HOME/.cargo/registry/index
 
 task:
