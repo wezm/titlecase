@@ -31,6 +31,9 @@ use std::sync::OnceLock;
 
 use regex::{Captures, Regex};
 
+#[cfg(target_family = "wasm")]
+mod wasm;
+
 #[rustfmt::skip]
 const SMALL_WORDS: &[&str] = &[
     "a",
