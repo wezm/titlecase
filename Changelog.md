@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## [3.2.0](https://github.com/wezm/titlecase/releases/tag/v3.2.0)
+
+- Introduce `perf` cargo feature tied to the feature of the same
+  name in the regex crate.
+  - This allows building for wasm with this feature disabled,
+    producing a smaller wasm module.
+
 ## [3.1.1](https://github.com/wezm/titlecase/releases/tag/v3.1.1)
 
 - Tweak Cargo metadata to make crates.io accept it
