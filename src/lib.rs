@@ -31,7 +31,7 @@ use std::sync::OnceLock;
 
 use regex::{Captures, Regex};
 
-#[cfg(target_family = "wasm")]
+#[cfg(feature = "wasm")]
 mod wasm;
 
 #[rustfmt::skip]
