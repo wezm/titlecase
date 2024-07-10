@@ -62,7 +62,7 @@ task:
     - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain ${WASM_VERSION}
     - rustup target add wasm32-unknown-unknown
   build_script:
-    - cargo build --lib --target wasm32-unknown-unknown
+    - cargo build --lib --features wasm --target wasm32-unknown-unknown
   before_cache_script: rm -rf $HOME/.cargo/registry/index
 
 task:
