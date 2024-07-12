@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## [3.3.0](https://github.com/wezm/titlecase/releases/tag/v3.3.0)
+
+- Introduce `wasm` cargo feature to enable wasm functionality
+  to address [#26](https://github.com/wezm/titlecase/issues/26).
+
 ## [3.2.0](https://github.com/wezm/titlecase/releases/tag/v3.2.0)
 
 - Introduce `perf` cargo feature tied to the feature of the same

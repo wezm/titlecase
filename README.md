@@ -36,16 +36,8 @@ An Example With Small Words and Sub-Phrases: "The Example"
 
 ### Pre-compiled binaries
 
-Pre-compiled binaries are available for a some platforms:
-
-* [FreeBSD 13+ amd64](https://releases.wezm.net/titlecase/3.2.0/titlecase-3.2.0-amd64-unknown-freebsd.tar.gz)
-* [Linux x86\_64](https://releases.wezm.net/titlecase/3.2.0/titlecase-3.2.0-x86_64-unknown-linux-musl.tar.gz)
-* [MacOS Universal](https://releases.wezm.net/titlecase/3.2.0/titlecase-3.2.0-universal-apple-darwin.tar.gz)
-* [Windows x86\_64](https://releases.wezm.net/titlecase/3.2.0/titlecase-3.2.0-x86_64-pc-windows-msvc.zip)
-
-Example to download and extract a binary:
-
-    curl https://releases.wezm.net/titlecase/3.2.0/titlecase-3.2.0-x86_64-unknown-linux-musl.tar.gz | tar zxf -
+Pre-compiled binaries are available for some platforms, check the
+[latest release](https://github.com/wezm/titlecase/releases/latest).
 
 ### From Source
 
