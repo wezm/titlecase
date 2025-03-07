@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## [3.4.0](https://github.com/wezm/titlecase/releases/tag/v3.4.0)
+
+- Add `Titlecase` trait and implementation to allow calling `.titlecase()` on
+  `AsRef<str>` types [#31](https://github.com/wezm/titlecase/pull/31). Thanks
+  @carlocorradini
+
 ## [3.3.0](https://github.com/wezm/titlecase/releases/tag/v3.3.0)
 
 - Introduce `wasm` cargo feature to enable wasm functionality
