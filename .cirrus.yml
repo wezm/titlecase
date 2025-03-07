@@ -8,7 +8,7 @@ env:
 task:
   name: Build (Alpine Linux)
   container:
-    image: alpine:3.19
+    image: alpine:3.21
     cpu: 4
   environment:
     RUST_VERSION: "stable"
@@ -68,7 +68,7 @@ task:
 task:
   name: Build (FreeBSD)
   freebsd_instance:
-    image_family: freebsd-13-3
+    image_family: freebsd-13-4
     cpu: 4
   cargo_cache:
     folder: $HOME/.cargo/registry
