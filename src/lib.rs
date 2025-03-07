@@ -6,10 +6,11 @@
 //!
 //! ## Example
 //!
-//! ```
-//! use titlecase::titlecase;
+//! ```rust
+//! use titlecase::{titlecase, Titlecase};
 //!
 //! let text = "a sample title to capitalize: an example";
+//! assert_eq!(text.titlecase(), "A Sample Title to Capitalize: An Example");
 //! assert_eq!(titlecase(text), "A Sample Title to Capitalize: An Example");
 //! ```
 //!
@@ -74,6 +75,26 @@ fn words_regex() -> &'static Regex {
         )
         .expect("unable to compile words regex")
     })
+}
+
+/// A trait describing an item that can be converted to title case.
+///
+/// # Examples
+///
+/// ```rust
+/// use titlecase::Titlecase;
+///
+/// assert_eq!("hello world!".titlecase(), "Hello World!");
+/// ```
+pub trait Titlecase {
+    /// Convert `self` to title case.
+    fn titlecase(&self) -> String;
+}
+
+impl<T: AsRef<str>> Titlecase for T {
+    fn titlecase(&self) -> String {
+        titlecase(self.as_ref())
+    }
 }
 
 /// Returns `input` in title case.
@@ -235,13 +256,14 @@ fn fix_small_word_at_end(text: &str) -> Cow<'_, str> {
 
 #[cfg(test)]
 mod tests {
-    use super::titlecase;
+    use super::{titlecase, Titlecase};
 
     macro_rules! testcase {
         ($name:ident, $input:expr, $expected:expr) => {
             #[test]
             fn $name() {
                 assert_eq!(titlecase($input), $expected);
+                assert_eq!($input.titlecase(), $expected);
             }
         };
     }
