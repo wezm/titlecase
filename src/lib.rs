@@ -108,9 +108,14 @@ impl<T: AsRef<str>> Titlecase for T {
 /// assert_eq!(titlecase(text), "A Sample Title to Capitalize: An Example");
 /// ```
 pub fn titlecase(input: &str) -> String {
-    // If input is yelling (all uppercase) make lowercase
+    titlecase_internal(input, false)
+}
+
+fn titlecase_internal(input: &str, skip_to_lowercase: bool) -> String {
+    // Remove leading and trailing whitespace
     let trimmed_input = input.trim();
-    let trimmed_input = if trimmed_input.chars().any(|ch| ch.is_lowercase()) {
+    // If input is yelling (all uppercase) make lowercase
+    let trimmed_input = if skip_to_lowercase || trimmed_input.chars().any(|ch| ch.is_lowercase()) {
         Cow::from(trimmed_input)
     } else {
         Cow::from(trimmed_input.to_lowercase())
@@ -138,25 +143,28 @@ fn small_words_regex() -> &'static Regex {
 }
 
 fn process_word(word: &str) -> Cow<'_, str> {
-    if is_digital_resource(word) || is_acronym(word) {
-        // pass through
+    if is_digital_resource(word) {
+        // Pass through
         return Cow::from(word);
     }
 
     let lower_word = word.to_lowercase();
     if small_words_regex().is_match(&lower_word) {
         Cow::from(lower_word)
-    } else if starts_with_bracket(word) {
-        let rest = titlecase(&word[1..]);
-        Cow::from(format!("({}", rest))
     } else if has_internal_slashes(word) {
         Cow::from(
             word.split('/')
-                .map(titlecase)
+                .map(|word| titlecase_internal(word, true))
                 // TODO: Awaiting rust iter.intersperse('/');
                 .collect::<Vec<String>>()
                 .join("/"),
         )
+    } else if is_acronym(word) {
+        // Preserve caps like (BBC) or (DVD)
+        Cow::from(word)
+    } else if starts_with_bracket(word) {
+        let rest = titlecase(&word[1..]);
+        Cow::from(format!("({}", rest))
     } else if has_internal_caps(word) {
         // Preserve internal caps like iPhone or DuBois
         Cow::from(word)
@@ -214,9 +222,7 @@ fn is_acronym(word: &str) -> bool {
         ')' => acc - 1,
         _ => acc,
     }) == 0
-        && 
-        // Check regex
-        is_acronym_regex().is_match(word)
+        && is_acronym_regex().is_match(word)
 }
 
 // E.g. iPhone or DuBois
@@ -345,8 +351,8 @@ mod tests {
 
     testcase!(
         acronym,
-        "(ABC) ((ABC)) (ABC ABC) ((ABC) (ABC)) (Abc) (abc) (aBC) (aBc) ABC",
-        "(ABC) ((ABC)) (Abc ABC) ((Abc) (Abc)) (Abc) (Abc) (aBC) (aBc) ABC"
+        "(ABC) ((ABC)) (ABC ABC) ((ABC) (ABC)) (Abc) (abc) (aBC) (aBc) (ABC)/(ABC) (ABC)/abc ABC",
+        "(ABC) ((ABC)) (Abc ABC) ((Abc) (Abc)) (Abc) (Abc) (aBC) (aBc) (ABC)/(ABC) (ABC)/Abc ABC"
     );
 
     testcase!(iphone, "BlackBerry vs. iPhone", "BlackBerry vs. iPhone");
