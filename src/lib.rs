@@ -108,9 +108,14 @@ impl<T: AsRef<str>> Titlecase for T {
 /// assert_eq!(titlecase(text), "A Sample Title to Capitalize: An Example");
 /// ```
 pub fn titlecase(input: &str) -> String {
-    // If input is yelling (all uppercase) make lowercase
+    titlecase_internal(input, false)
+}
+
+fn titlecase_internal(input: &str, skip_to_lowercase: bool) -> String {
+    // Remove leading and trailing whitespace
     let trimmed_input = input.trim();
-    let trimmed_input = if trimmed_input.chars().any(|ch| ch.is_lowercase()) {
+    // If input is yelling (all uppercase) make lowercase
+    let trimmed_input = if skip_to_lowercase || trimmed_input.chars().any(|ch| ch.is_lowercase()) {
         Cow::from(trimmed_input)
     } else {
         Cow::from(trimmed_input.to_lowercase())
@@ -139,24 +144,27 @@ fn small_words_regex() -> &'static Regex {
 
 fn process_word(word: &str) -> Cow<'_, str> {
     if is_digital_resource(word) {
-        // pass through
+        // Pass through
         return Cow::from(word);
     }
 
     let lower_word = word.to_lowercase();
     if small_words_regex().is_match(&lower_word) {
         Cow::from(lower_word)
-    } else if starts_with_bracket(word) {
-        let rest = titlecase(&word[1..]);
-        Cow::from(format!("({}", rest))
     } else if has_internal_slashes(word) {
         Cow::from(
             word.split('/')
-                .map(titlecase)
+                .map(|word| titlecase_internal(word, true))
                 // TODO: Awaiting rust iter.intersperse('/');
                 .collect::<Vec<String>>()
                 .join("/"),
         )
+    } else if is_acronym(word) {
+        // Preserve caps like (BBC) or (DVD)
+        Cow::from(word)
+    } else if starts_with_bracket(word) {
+        let rest = titlecase(&word[1..]);
+        Cow::from(format!("({}", rest))
     } else if has_internal_caps(word) {
         // Preserve internal caps like iPhone or DuBois
         Cow::from(word)
@@ -190,6 +198,31 @@ fn is_digital_resource_regex() -> &'static Regex {
 
 fn is_digital_resource(word: &str) -> bool {
     is_digital_resource_regex().is_match(word)
+}
+
+#[inline]
+fn is_acronym_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(
+            r"(?x)
+            \A
+            \(+[A-Z0-9]+\)+
+            \z",
+        )
+        .expect("")
+    })
+}
+
+// E.g. (BBC) or (DVD)
+fn is_acronym(word: &str) -> bool {
+    // Check if the number of open and closed braces is equal
+    word.chars().fold(0, |acc, char| match char {
+        '(' => acc + 1,
+        ')' => acc - 1,
+        _ => acc,
+    }) == 0
+        && is_acronym_regex().is_match(word)
 }
 
 // E.g. iPhone or DuBois
@@ -314,6 +347,12 @@ mod tests {
         name_url,
         "Scott Moritz and TheStreet.com’s million iPhone la‑la land",
         "Scott Moritz and TheStreet.com’s Million iPhone La‑La Land"
+    );
+
+    testcase!(
+        acronym,
+        "(ABC) ((ABC)) (ABC ABC) ((ABC) (ABC)) (Abc) (abc) (aBC) (aBc) (ABC)/(ABC) (ABC)/abc ABC",
+        "(ABC) ((ABC)) (Abc ABC) ((Abc) (Abc)) (Abc) (Abc) (aBC) (aBc) (ABC)/(ABC) (ABC)/Abc ABC"
     );
 
     testcase!(iphone, "BlackBerry vs. iPhone", "BlackBerry vs. iPhone");
