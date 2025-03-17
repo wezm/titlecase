@@ -84,6 +84,7 @@ Instead of simply capitalizing each word `titlecase` does the following
 * Always capitalize the first and last words, even if they are small words
   or surrounded by quotes.
 * Don't interfere with terms like "Q&A", or "AT&T".
+* Don't interfere with acronyms like "(BBC)" or "(DVD)".
 * Capitalize small words after a colon.
 
 ## Credits

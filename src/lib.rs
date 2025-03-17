@@ -138,7 +138,7 @@ fn small_words_regex() -> &'static Regex {
 }
 
 fn process_word(word: &str) -> Cow<'_, str> {
-    if is_digital_resource(word) {
+    if is_digital_resource(word) || is_acronym(word) {
         // pass through
         return Cow::from(word);
     }
@@ -190,6 +190,33 @@ fn is_digital_resource_regex() -> &'static Regex {
 
 fn is_digital_resource(word: &str) -> bool {
     is_digital_resource_regex().is_match(word)
+}
+
+#[inline]
+fn is_acronym_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(
+            r"(?x)
+            \A
+            \(+[A-Z0-9]+\)+
+            \z",
+        )
+        .expect("")
+    })
+}
+
+// E.g. (BBC) or (DVD)
+fn is_acronym(word: &str) -> bool {
+    // Check if the number of open and closed braces is equal
+    word.chars().fold(0, |acc, char| match char {
+        '(' => acc + 1,
+        ')' => acc - 1,
+        _ => acc,
+    }) == 0
+        && 
+        // Check regex
+        is_acronym_regex().is_match(word)
 }
 
 // E.g. iPhone or DuBois
@@ -314,6 +341,12 @@ mod tests {
         name_url,
         "Scott Moritz and TheStreet.com’s million iPhone la‑la land",
         "Scott Moritz and TheStreet.com’s Million iPhone La‑La Land"
+    );
+
+    testcase!(
+        acronym,
+        "(ABC) ((ABC)) (ABC ABC) ((ABC) (ABC)) (Abc) (abc) (aBC) (aBc) ABC",
+        "(ABC) ((ABC)) (Abc ABC) ((Abc) (Abc)) (Abc) (Abc) (aBC) (aBc) ABC"
     );
 
     testcase!(iphone, "BlackBerry vs. iPhone", "BlackBerry vs. iPhone");
