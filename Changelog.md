@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## [3.5.0](https://github.com/wezm/titlecase/releases/tag/v3.5.0)
+
+- Preserve uppercase text in brackets, such as acronyms
+  [#35](https://github.com/wezm/titlecase/pull/35).
+  Thanks @carlocorradini
+
 ## [3.4.0](https://github.com/wezm/titlecase/releases/tag/v3.4.0)
 
 - Add `Titlecase` trait and implementation to allow calling `.titlecase()` on
