@@ -70,7 +70,7 @@ fn words_regex() -> &'static Regex {
         Regex::new(
             r"(?x)
              (_*)
-             ([\w'’.:/@\[\]/()&]+)
+             ([\w'’.:/@\[\]/()&\-]+)
              (_*)",
         )
         .expect("unable to compile words regex")
@@ -160,8 +160,16 @@ fn process_word(word: &str) -> Cow<'_, str> {
                 .join("/"),
         )
     } else if is_acronym(word) {
-        // Preserve caps like (BBC) or (DVD)
+        // Preserve caps like (BBC) or (HELLO-WORLD)
         Cow::from(word)
+    } else if has_internal_hyphens(word) {
+        Cow::from(
+            word.split('-')
+                .map(|word| titlecase_internal(word, true))
+                // TODO: Awaiting rust iter.intersperse('-');
+                .collect::<Vec<String>>()
+                .join("-"),
+        )
     } else if starts_with_bracket(word) {
         let rest = titlecase(&word[1..]);
         Cow::from(format!("({}", rest))
@@ -207,14 +215,14 @@ fn is_acronym_regex() -> &'static Regex {
         Regex::new(
             r"(?x)
             \A
-            \(+[A-Z0-9]+\)+
+            \(+[A-Z0-9]+(?:-[A-Z0-9]+)*\)+
             \z",
         )
-        .expect("")
+        .expect("unable to compile acronym regex")
     })
 }
 
-// E.g. (BBC) or (DVD)
+// E.g. (BBC) or (HELLO-WORLD)
 fn is_acronym(word: &str) -> bool {
     // Check if the number of open and closed braces is equal
     word.chars().fold(0, |acc, char| match char {
@@ -232,6 +240,10 @@ fn has_internal_caps(word: &str) -> bool {
 
 fn has_internal_slashes(word: &str) -> bool {
     !word.is_empty() && word.chars().skip(1).any(|chr| chr == '/')
+}
+
+fn has_internal_hyphens(word: &str) -> bool {
+    !word.is_empty() && word.chars().skip(1).any(|chr| chr == '-')
 }
 
 fn starts_with_bracket(word: &str) -> bool {
@@ -304,7 +316,7 @@ mod tests {
     testcase!(
         email,
         "For step-by-step directions email someone@gmail.com",
-        "For Step-by-Step Directions Email someone@gmail.com"
+        "For Step-By-Step Directions Email someone@gmail.com"
     );
 
     testcase!(
@@ -353,6 +365,12 @@ mod tests {
         acronym,
         "(ABC) ((ABC)) (ABC ABC) ((ABC) (ABC)) (Abc) (abc) (aBC) (aBc) (ABC)/(ABC) (ABC)/abc ABC",
         "(ABC) ((ABC)) (Abc ABC) ((Abc) (Abc)) (Abc) (Abc) (aBC) (aBc) (ABC)/(ABC) (ABC)/Abc ABC"
+    );
+
+    testcase!(
+        acronym_hyphen,
+        "(HELLO-WORLD) (HELLO-WORLD-DASH) (HELLO-WORLD-01) (HELLO-world) (HELLO-WORLD-)",
+        "(HELLO-WORLD) (HELLO-WORLD-DASH) (HELLO-WORLD-01) (Hello-World) (Hello-WORLD-)"
     );
 
     testcase!(iphone, "BlackBerry vs. iPhone", "BlackBerry vs. iPhone");
@@ -475,23 +493,22 @@ mod tests {
         "Never Touch Paths Like /var/run Before/After /boot"
     );
 
-    // TODO: Implement these
-    // testcase!(
-    //     in_flight,
-    //     "The in-flight entertainment was excellent",
-    //     "The In-Flight Entertainment Was Excellent"
-    // );
+    testcase!(
+        in_flight,
+        "The in-flight entertainment was excellent",
+        "The In-Flight Entertainment Was Excellent"
+    );
 
-    // testcase!(
-    //     stand_in,
-    //     "The Stand-in teacher gave us homework",
-    //     "The Stand-In Teacher Gave Us Homework"
-    // );
+    testcase!(
+        stand_in,
+        "The Stand-in teacher gave us homework",
+        "The Stand-In Teacher Gave Us Homework"
+    );
 
     testcase!(
         man_in_the_middle,
         "They executed a man-in-the-middle attack",
-        "They Executed a Man-in-the-Middle Attack"
+        "They Executed a Man-In-The-Middle Attack"
     );
 
     testcase!(
