@@ -239,15 +239,20 @@ fn has_internal_caps(word: &str) -> bool {
 }
 
 fn has_internal_slashes(word: &str) -> bool {
-    !word.is_empty() && word.chars().skip(1).any(|chr| chr == '/')
+    second_letter_onwards(word).contains('/')
 }
 
 fn has_internal_hyphens(word: &str) -> bool {
-    !word.is_empty() && word.chars().skip(1).any(|chr| chr == '-')
+    second_letter_onwards(word).contains('-')
 }
 
 fn starts_with_bracket(word: &str) -> bool {
     word.starts_with('(')
+}
+
+fn second_letter_onwards(word: &str) -> &str {
+    let offset = ceil_char_boundary(word, 1);
+    &word[offset..]
 }
 
 #[inline]
@@ -299,9 +304,31 @@ fn fix_small_word_at_end(text: &str) -> Cow<'_, str> {
     })
 }
 
+// TODO: use str implementation when stable
+// https://github.com/rust-lang/rust/issues/93743
+#[inline]
+pub fn ceil_char_boundary(s: &str, index: usize) -> usize {
+    if index > s.len() {
+        s.len()
+    } else {
+        let upper_bound = Ord::min(index + 4, s.len());
+
+        s.as_bytes()[index..upper_bound]
+            .iter()
+            .position(|b| is_utf8_char_boundary(*b))
+            .map_or(upper_bound, |pos| pos + index)
+    }
+}
+
+#[inline]
+pub(crate) const fn is_utf8_char_boundary(b: u8) -> bool {
+    // This is bit magic equivalent to: b < 128 || b >= 192
+    (b as i8) >= -0x40
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{titlecase, Titlecase};
+    use super::{second_letter_onwards, titlecase, Titlecase};
 
     macro_rules! testcase {
         ($name:ident, $input:expr, $expected:expr) => {
@@ -530,4 +557,18 @@ mod tests {
         "発売時の名称は「apple macintosh」であったが、後に拡張版のMacintosh 512Kが発売された段階で「macintosh 128K」と再命名された。test",
         "発売時の名称は「Apple Macintosh」であったが、後に拡張版のMacintosh 512Kが発売された段階で「Macintosh 128K」と再命名された。Test"
     );
+
+    testcase!(multibyte_hyphen, "👽-green-alien", "👽-Green-Alien");
+
+    #[test]
+    fn test_second_letter_onwards() {
+        assert_eq!(second_letter_onwards(""), "");
+        assert_eq!(second_letter_onwards("a"), "");
+        assert_eq!(second_letter_onwards("ab"), "b");
+        assert_eq!(
+            second_letter_onwards("「Apple Macintosh」"),
+            "Apple Macintosh」"
+        );
+        assert_eq!(second_letter_onwards("⌚"), "");
+    }
 }
