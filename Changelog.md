@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## [3.6.0](https://github.com/wezm/titlecase/releases/tag/v3.6.0)
+
+- Support hypendated words [#37](https://github.com/wezm/titlecase/pull/37).
+  Thanks @carlocorradini
+
 ## [3.5.0](https://github.com/wezm/titlecase/releases/tag/v3.5.0)
 
 - Preserve uppercase text in brackets, such as acronyms
